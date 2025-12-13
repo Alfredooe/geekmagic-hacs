@@ -3,19 +3,18 @@
 from __future__ import annotations
 
 from io import BytesIO
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 from PIL import Image, ImageDraw, ImageFont
 
 from .const import (
-    DISPLAY_WIDTH,
-    DISPLAY_HEIGHT,
-    DEFAULT_JPEG_QUALITY,
     COLOR_BLACK,
-    COLOR_WHITE,
-    COLOR_GRAY,
     COLOR_CYAN,
+    COLOR_GRAY,
+    COLOR_WHITE,
+    DEFAULT_JPEG_QUALITY,
+    DISPLAY_HEIGHT,
+    DISPLAY_WIDTH,
 )
 
 if TYPE_CHECKING:
@@ -57,7 +56,9 @@ class Renderer:
         self.font_large = _load_font(24)
         self.font_xlarge = _load_font(36)
 
-    def create_canvas(self, background: tuple[int, int, int] = COLOR_BLACK) -> tuple[Image.Image, ImageDraw.Draw]:
+    def create_canvas(
+        self, background: tuple[int, int, int] = COLOR_BLACK
+    ) -> tuple[Image.Image, ImageDraw.ImageDraw]:
         """Create a new image canvas.
 
         Args:
@@ -72,7 +73,7 @@ class Renderer:
 
     def draw_text(
         self,
-        draw: ImageDraw.Draw,
+        draw: ImageDraw.ImageDraw,
         text: str,
         position: tuple[int, int],
         font: FreeTypeFont | ImageFont.ImageFont | None = None,
@@ -95,7 +96,7 @@ class Renderer:
 
     def draw_rect(
         self,
-        draw: ImageDraw.Draw,
+        draw: ImageDraw.ImageDraw,
         rect: tuple[int, int, int, int],
         fill: tuple[int, int, int] | None = None,
         outline: tuple[int, int, int] | None = None,
@@ -114,7 +115,7 @@ class Renderer:
 
     def draw_bar(
         self,
-        draw: ImageDraw.Draw,
+        draw: ImageDraw.ImageDraw,
         rect: tuple[int, int, int, int],
         percent: float,
         color: tuple[int, int, int] = COLOR_CYAN,
@@ -142,7 +143,7 @@ class Renderer:
 
     def draw_sparkline(
         self,
-        draw: ImageDraw.Draw,
+        draw: ImageDraw.ImageDraw,
         rect: tuple[int, int, int, int],
         data: list[float],
         color: tuple[int, int, int] = COLOR_CYAN,
@@ -178,7 +179,7 @@ class Renderer:
 
         # Draw filled area if requested
         if fill:
-            fill_points = [(x1, y2)] + points + [(x2, y2)]
+            fill_points = [(x1, y2), *points, (x2, y2)]
             # Use semi-transparent fill
             fill_color = (color[0] // 4, color[1] // 4, color[2] // 4)
             draw.polygon(fill_points, fill=fill_color)
@@ -189,7 +190,7 @@ class Renderer:
 
     def draw_arc(
         self,
-        draw: ImageDraw.Draw,
+        draw: ImageDraw.ImageDraw,
         rect: tuple[int, int, int, int],
         percent: float,
         color: tuple[int, int, int] = COLOR_CYAN,
@@ -234,7 +235,7 @@ class Renderer:
         # Use getbbox for more accurate measurements
         bbox = font.getbbox(text)
         if bbox:
-            return bbox[2] - bbox[0], bbox[3] - bbox[1]
+            return int(bbox[2] - bbox[0]), int(bbox[3] - bbox[1])
         return 0, 0
 
     def to_jpeg(self, img: Image.Image, quality: int = DEFAULT_JPEG_QUALITY) -> bytes:

@@ -6,18 +6,17 @@ import logging
 from typing import Any
 
 import voluptuous as vol
-
 from homeassistant import config_entries
+from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.const import CONF_HOST, CONF_NAME
 from homeassistant.core import callback
-from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .const import (
-    DOMAIN,
-    CONF_REFRESH_INTERVAL,
     CONF_LAYOUT,
+    CONF_REFRESH_INTERVAL,
     DEFAULT_REFRESH_INTERVAL,
+    DOMAIN,
     LAYOUT_GRID_2X2,
     LAYOUT_GRID_2X3,
     LAYOUT_HERO,
@@ -40,9 +39,7 @@ class GeekMagicConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     VERSION = 1
 
-    async def async_step_user(
-        self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the initial step."""
         errors: dict[str, str] = {}
 
@@ -62,8 +59,7 @@ class GeekMagicConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     title=user_input.get(CONF_NAME, f"GeekMagic ({host})"),
                     data=user_input,
                 )
-            else:
-                errors["base"] = "cannot_connect"
+            errors["base"] = "cannot_connect"
 
         return self.async_show_form(
             step_id="user",
@@ -87,9 +83,7 @@ class GeekMagicOptionsFlow(config_entries.OptionsFlow):
         """Initialize options flow."""
         self.config_entry = config_entry
 
-    async def async_step_init(
-        self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle options flow."""
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)

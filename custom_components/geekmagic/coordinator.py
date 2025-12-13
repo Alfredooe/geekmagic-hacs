@@ -4,32 +4,32 @@ from __future__ import annotations
 
 import logging
 from datetime import timedelta
-from typing import Any
+from typing import Any, cast
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .const import (
-    DOMAIN,
-    CONF_REFRESH_INTERVAL,
     CONF_LAYOUT,
+    CONF_REFRESH_INTERVAL,
     CONF_WIDGETS,
     DEFAULT_REFRESH_INTERVAL,
+    DOMAIN,
     LAYOUT_GRID_2X2,
     LAYOUT_GRID_2X3,
     LAYOUT_HERO,
     LAYOUT_SPLIT,
 )
 from .device import GeekMagicDevice
-from .renderer import Renderer
 from .layouts.grid import Grid2x2, Grid2x3
 from .layouts.hero import HeroLayout
 from .layouts.split import SplitLayout
+from .renderer import Renderer
 from .widgets.base import WidgetConfig
+from .widgets.chart import ChartWidget
 from .widgets.clock import ClockWidget
 from .widgets.entity import EntityWidget
 from .widgets.media import MediaWidget
-from .widgets.chart import ChartWidget
 from .widgets.text import TextWidget
 
 _LOGGER = logging.getLogger(__name__)
@@ -102,8 +102,8 @@ class GeekMagicCoordinator(DataUpdateCoordinator):
 
         # Create and assign widgets
         for widget_config in widgets_config:
-            widget_type = widget_config.get("type", "text")
-            slot = widget_config.get("slot", 0)
+            widget_type = str(widget_config.get("type", "text"))
+            slot = int(widget_config.get("slot", 0))
 
             if slot >= self._layout.get_slot_count():
                 continue
@@ -112,13 +112,23 @@ class GeekMagicCoordinator(DataUpdateCoordinator):
             if widget_class is None:
                 continue
 
+            entity_id = widget_config.get("entity_id")
+            label = widget_config.get("label")
+            raw_color = widget_config.get("color")
+            options = widget_config.get("options") or {}
+
+            # Parse color - can be tuple/list of RGB values
+            parsed_color: tuple[int, int, int] | None = None
+            if isinstance(raw_color, list | tuple) and len(raw_color) == 3:
+                parsed_color = (int(raw_color[0]), int(raw_color[1]), int(raw_color[2]))
+
             config = WidgetConfig(
                 widget_type=widget_type,
                 slot=slot,
-                entity_id=widget_config.get("entity_id"),
-                label=widget_config.get("label"),
-                color=widget_config.get("color"),
-                options=widget_config.get("options", {}),
+                entity_id=str(entity_id) if entity_id is not None else None,
+                label=str(label) if label is not None else None,
+                color=parsed_color,
+                options=cast("dict[str, Any]", options),
             )
 
             widget = widget_class(config)
@@ -165,7 +175,7 @@ class GeekMagicCoordinator(DataUpdateCoordinator):
             }
 
         except Exception as err:
-            _LOGGER.error("Error updating GeekMagic display: %s", err)
+            _LOGGER.exception("Error updating GeekMagic display")
             raise UpdateFailed(f"Error updating display: {err}") from err
 
     async def async_set_brightness(self, brightness: int) -> None:
