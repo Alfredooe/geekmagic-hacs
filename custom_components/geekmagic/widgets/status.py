@@ -54,7 +54,7 @@ class StatusWidget(Widget):
         # Determine if on or off
         is_on = False
         if state is not None:
-            is_on = state.state.lower() in ("on", "true", "home", "open", "unlocked", "1")
+            is_on = state.state.lower() in ("on", "true", "home", "locked", "1")
 
         # Get color and text
         color = self.on_color if is_on else self.off_color
@@ -178,7 +178,12 @@ class StatusListWidget(Widget):
 
             is_on = False
             if state is not None:
-                is_on = state.state.lower() in ("on", "true", "home", "open", "unlocked", "1")
+                # Consider these states as "on" (good/active):
+                # - "on", "true", "1" for switches/lights
+                # - "home" for presence
+                # - "locked" for locks (security = good)
+                # - "open" for covers/doors that should be open
+                is_on = state.state.lower() in ("on", "true", "home", "locked", "1")
                 if not label:
                     label = state.attributes.get("friendly_name", entity_id)
             label = label or entity_id

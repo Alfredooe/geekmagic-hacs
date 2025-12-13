@@ -27,6 +27,8 @@ class GaugeWidget(Widget):
         self.icon = config.options.get("icon")
         self.show_value = config.options.get("show_value", True)
         self.unit = config.options.get("unit", "")
+        # Attribute to read value from (e.g., "temperature" for climate entities)
+        self.attribute = config.options.get("attribute")
 
     def render(
         self,
@@ -52,8 +54,10 @@ class GaugeWidget(Widget):
         display_value = "--"
 
         if state is not None:
+            # Read from attribute if specified, otherwise from state
+            raw_value = state.attributes.get(self.attribute) if self.attribute else state.state
             with contextlib.suppress(ValueError, TypeError):
-                value = float(state.state)
+                value = float(raw_value)
                 display_value = f"{value:.0f}"
             if not self.unit:
                 self.unit = state.attributes.get("unit_of_measurement", "")
