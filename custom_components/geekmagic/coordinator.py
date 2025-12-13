@@ -71,6 +71,7 @@ class GeekMagicCoordinator(DataUpdateCoordinator):
         self.renderer = Renderer()
         self._layout = None
         self._widgets_config: list[dict] = []
+        self._last_image: bytes | None = None  # PNG bytes for camera preview
 
         # Get refresh interval from options
         interval = options.get(CONF_REFRESH_INTERVAL, DEFAULT_REFRESH_INTERVAL)
@@ -165,6 +166,9 @@ class GeekMagicCoordinator(DataUpdateCoordinator):
             if self._layout:
                 self._layout.render(self.renderer, draw, self.hass)
 
+            # Store PNG for camera preview
+            self._last_image = self.renderer.to_png(img)
+
             # Convert to JPEG and upload
             jpeg_data = self.renderer.to_jpeg(img)
             await self.device.upload_and_display(jpeg_data, "dashboard.jpg")
@@ -177,6 +181,11 @@ class GeekMagicCoordinator(DataUpdateCoordinator):
         except Exception as err:
             _LOGGER.exception("Error updating GeekMagic display")
             raise UpdateFailed(f"Error updating display: {err}") from err
+
+    @property
+    def last_image(self) -> bytes | None:
+        """Get the last rendered image as PNG bytes."""
+        return self._last_image
 
     async def async_set_brightness(self, brightness: int) -> None:
         """Set display brightness.
