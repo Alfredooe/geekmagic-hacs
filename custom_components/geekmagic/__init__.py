@@ -15,7 +15,15 @@ from .device import GeekMagicDevice
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS: list[Platform] = [Platform.IMAGE]
+PLATFORMS: list[Platform] = [
+    Platform.IMAGE,
+    Platform.NUMBER,
+    Platform.SELECT,
+    Platform.SWITCH,
+    Platform.TEXT,
+    Platform.BUTTON,
+    Platform.SENSOR,
+]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -46,6 +54,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass=hass,
         device=device,
         options=dict(entry.options),
+        config_entry=entry,
     )
 
     # Do first refresh

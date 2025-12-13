@@ -1,4 +1,67 @@
 {
+  "entity": {
+    "number": {
+      "brightness": {
+        "name": "Brightness"
+      },
+      "refresh_interval": {
+        "name": "Refresh Interval"
+      },
+      "screen_cycle_interval": {
+        "name": "Screen Cycle Interval"
+      },
+      "screen_count": {
+        "name": "Screen Count"
+      }
+    },
+    "button": {
+      "refresh_now": {
+        "name": "Refresh Now"
+      },
+      "next_screen": {
+        "name": "Next Screen"
+      },
+      "previous_screen": {
+        "name": "Previous Screen"
+      }
+    },
+    "sensor": {
+      "status": {
+        "name": "Status"
+      },
+      "last_update": {
+        "name": "Last Update"
+      },
+      "current_screen_name": {
+        "name": "Current Screen"
+      }
+    },
+    "select": {
+      "current_screen": {
+        "name": "Current Screen"
+      },
+      "screen_template": {
+        "name": "Template"
+      },
+      "screen_layout": {
+        "name": "Layout"
+      },
+      "slot_widget": {
+        "name": "Widget"
+      }
+    },
+    "text": {
+      "screen_name": {
+        "name": "Name"
+      },
+      "slot_entity": {
+        "name": "Entity"
+      },
+      "slot_label": {
+        "name": "Label"
+      }
+    }
+  },
   "config": {
     "step": {
       "user": {

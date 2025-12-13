@@ -221,9 +221,9 @@ def render_preview(
         mock = MockHass()
         for widget_config in widgets_config:
             _set_mock_state_for_widget(mock, widget_config)
-        render_hass: Any = cast(Any, mock)
+        render_hass: Any = cast("Any", mock)
     else:
-        render_hass = cast(Any, hass)
+        render_hass = cast("Any", hass)
 
     # Create renderer and layout
     renderer = Renderer()
