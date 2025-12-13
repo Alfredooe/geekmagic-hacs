@@ -478,11 +478,75 @@ class GeekMagicSlotEntitySelect(GeekMagicSelectEntity):
             return widget.get("type")
         return None
 
+    def _format_entity_option(self, entity_id: str) -> str:
+        """Format entity option with name, value, and area.
+
+        Format: "entity_id │ Name │ Value │ Area"
+        """
+        state = self._hass_ref.states.get(entity_id)
+        if state is None:
+            return entity_id
+
+        # Get friendly name (truncate if too long)
+        name = state.attributes.get("friendly_name", "")
+        if len(name) > 25:
+            name = name[:22] + "..."
+
+        # Get current value (truncate if too long)
+        value = state.state
+        if len(value) > 15:
+            value = value[:12] + "..."
+
+        # Get unit if available
+        unit = state.attributes.get("unit_of_measurement", "")
+        if unit:
+            value = f"{value} {unit}"
+
+        # Get area name
+        area = ""
+        entity_registry = self._hass_ref.data.get("entity_registry")
+        device_registry = self._hass_ref.data.get("device_registry")
+        area_registry = self._hass_ref.data.get("area_registry")
+
+        if entity_registry and area_registry:
+            entity_entry = entity_registry.async_get(entity_id)
+            if entity_entry:
+                # Check entity's direct area assignment
+                if entity_entry.area_id:
+                    area_entry = area_registry.async_get_area(entity_entry.area_id)
+                    if area_entry:
+                        area = area_entry.name
+                # Fall back to device's area
+                elif entity_entry.device_id and device_registry:
+                    device_entry = device_registry.async_get(entity_entry.device_id)
+                    if device_entry and device_entry.area_id:
+                        area_entry = area_registry.async_get_area(device_entry.area_id)
+                        if area_entry:
+                            area = area_entry.name
+
+        # Build formatted string
+        parts = [entity_id]
+        if name:
+            parts.append(name)
+        if value and value not in ("unknown", "unavailable"):
+            parts.append(value)
+        if area:
+            parts.append(f"[{area}]")
+
+        return " │ ".join(parts)
+
+    def _extract_entity_id(self, option: str) -> str:
+        """Extract entity_id from formatted option string."""
+        if option == "(none)":
+            return ""
+        # Entity ID is always the first part before " │ "
+        return option.split(" │ ")[0]
+
     @property
     def options(self) -> list[str]:
         """Return available entity options filtered by widget type.
 
-        Returns a list of entity IDs relevant to the current widget type.
+        Returns formatted options with name, value, and area.
         """
         widget_type = self._get_widget_type()
 
@@ -505,20 +569,23 @@ class GeekMagicSlotEntitySelect(GeekMagicSelectEntity):
                 if eid.split(".")[0] in common_domains
             ]
 
-        # Sort for consistency
+        # Sort by entity_id for consistency
         entity_ids = sorted(entity_ids)
 
+        # Format each option with additional info
+        formatted_options = [self._format_entity_option(eid) for eid in entity_ids]
+
         # Add "None" option at the start to allow clearing
-        return ["(none)", *entity_ids]
+        return ["(none)", *formatted_options]
 
     @property
     def current_option(self) -> str | None:
-        """Return the current entity_id."""
+        """Return the current entity_id formatted with details."""
         widget = self._get_widget_config()
         if widget:
             entity_id = widget.get("entity_id", "")
             if entity_id:
-                return entity_id
+                return self._format_entity_option(entity_id)
         return "(none)"
 
     async def async_select_option(self, option: str) -> None:
@@ -539,8 +606,8 @@ class GeekMagicSlotEntitySelect(GeekMagicSelectEntity):
         screens[screen_idx] = dict(screens[screen_idx])
         widgets = list(screens[screen_idx].get(CONF_WIDGETS, []))
 
-        # Determine entity_id value (empty if "(none)")
-        entity_id = "" if option == "(none)" else option
+        # Extract entity_id from formatted option
+        entity_id = self._extract_entity_id(option)
 
         # Find or update widget for this slot
         found = False
