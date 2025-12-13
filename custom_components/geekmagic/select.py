@@ -419,11 +419,27 @@ class GeekMagicSlotWidgetSelect(GeekMagicSelectEntity):
         return "Widget"
 
 
+# Domain filters for each widget type
+# Only show entities from these domains when the widget type is set
+WIDGET_DOMAIN_FILTERS: dict[str, list[str]] = {
+    "camera": ["camera"],
+    "weather": ["weather"],
+    "media": ["media_player"],
+    "entity": ["sensor", "binary_sensor", "input_number", "input_boolean", "counter"],
+    "gauge": ["sensor", "input_number", "counter", "number"],
+    "chart": ["sensor", "input_number", "counter", "number"],
+    "progress": ["sensor", "input_number", "counter", "number"],
+    "status": ["binary_sensor", "switch", "light", "lock", "device_tracker", "input_boolean"],
+    "text": ["sensor", "input_text", "input_number"],
+    # clock and empty don't need entities
+}
+
+
 class GeekMagicSlotEntitySelect(GeekMagicSelectEntity):
     """Select entity for slot entity_id with dropdown picker.
 
-    This provides a dropdown of available Home Assistant entities
-    for easier selection compared to typing entity IDs manually.
+    This provides a filtered dropdown of Home Assistant entities
+    based on the widget type for easier selection.
     """
 
     def __init__(
@@ -453,15 +469,42 @@ class GeekMagicSlotEntitySelect(GeekMagicSelectEntity):
                 return widget
         return None
 
+    def _get_widget_type(self) -> str | None:
+        """Get the current widget type for this slot."""
+        widget = self._get_widget_config()
+        if widget:
+            return widget.get("type")
+        return None
+
     @property
     def options(self) -> list[str]:
-        """Return available entity options.
+        """Return available entity options filtered by widget type.
 
-        Returns a list of all entity IDs plus "None" for clearing.
-        Entities are grouped by domain for easier navigation.
+        Returns a list of entity IDs relevant to the current widget type.
         """
-        # Get all entity IDs, sorted for consistency
-        entity_ids = sorted(self._hass_ref.states.async_entity_ids())
+        widget_type = self._get_widget_type()
+
+        # Get domain filter for this widget type
+        allowed_domains = WIDGET_DOMAIN_FILTERS.get(widget_type) if widget_type else None
+
+        if allowed_domains:
+            # Filter entities by domain
+            entity_ids = [
+                eid
+                for eid in self._hass_ref.states.async_entity_ids()
+                if eid.split(".")[0] in allowed_domains
+            ]
+        else:
+            # No filter - show common sensor-like entities
+            common_domains = ["sensor", "binary_sensor", "input_number", "input_boolean"]
+            entity_ids = [
+                eid
+                for eid in self._hass_ref.states.async_entity_ids()
+                if eid.split(".")[0] in common_domains
+            ]
+
+        # Sort for consistency
+        entity_ids = sorted(entity_ids)
 
         # Add "None" option at the start to allow clearing
         return ["(none)", *entity_ids]
