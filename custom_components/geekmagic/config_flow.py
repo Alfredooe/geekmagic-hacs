@@ -109,10 +109,8 @@ class GeekMagicOptionsFlow(config_entries.OptionsFlow):
         """Initialize options flow."""
         self._options: dict[str, Any] = {}
         self._current_screen_index: int = 0
-        self._current_slot: int = 0
         self._screen_config: dict[str, Any] = {}
-        self._current_widget_type: str = ""
-        self._current_widget_config: dict[str, Any] = {}
+        self._widget_types: dict[int, str] = {}  # slot -> widget type
         self._editing_screen: bool = False
 
     def _migrate_options(self, options: dict[str, Any]) -> dict[str, Any]:
@@ -236,185 +234,217 @@ class GeekMagicOptionsFlow(config_entries.OptionsFlow):
     async def async_step_add_screen(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Add a new screen."""
+        """Add a new screen with all widget types in one form."""
         if user_input is not None:
+            layout = user_input[CONF_LAYOUT]
+            slot_count = LAYOUT_SLOT_COUNTS.get(layout, 4)
+
             self._screen_config = {
                 "name": user_input["name"],
-                CONF_LAYOUT: user_input[CONF_LAYOUT],
+                CONF_LAYOUT: layout,
                 CONF_WIDGETS: [],
             }
-            self._current_slot = 0
-            return await self.async_step_configure_slot()
+
+            # Collect widget types for non-empty slots
+            self._widget_types = {}
+            for i in range(slot_count):
+                widget_type = user_input.get(f"slot_{i}_type", "empty")
+                if widget_type != "empty":
+                    self._widget_types[i] = widget_type
+
+            # If any widgets selected, go to configure them
+            if self._widget_types:
+                return await self.async_step_configure_widgets()
+            # Otherwise finish with empty screen
+            return await self._finish_screen_config()
 
         screen_count = len(self._options.get(CONF_SCREENS, []))
 
+        # Build schema with name, layout, and all slot type selectors
+        widget_options = {"empty": "Empty (skip)"}
+        widget_options.update(WIDGET_TYPE_NAMES)
+
+        # Use max slot count (6 for largest layout)
+        max_slots = max(LAYOUT_SLOT_COUNTS.values())
+        schema: dict[Any, Any] = {
+            vol.Required("name", default=f"Screen {screen_count + 1}"): str,
+            vol.Required(CONF_LAYOUT, default=LAYOUT_GRID_2X2): vol.In(LAYOUT_OPTIONS),
+        }
+        for i in range(max_slots):
+            schema[vol.Optional(f"slot_{i}_type", default="empty")] = vol.In(widget_options)
+
         return self.async_show_form(
             step_id="add_screen",
-            data_schema=vol.Schema(
-                {
-                    vol.Required("name", default=f"Screen {screen_count + 1}"): str,
-                    vol.Required(CONF_LAYOUT, default=LAYOUT_GRID_2X2): vol.In(LAYOUT_OPTIONS),
-                }
-            ),
+            data_schema=vol.Schema(schema),
         )
 
     async def async_step_edit_screen(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Edit existing screen."""
+        """Edit existing screen with all widget types in one form."""
         screens = self._options.get(CONF_SCREENS, [])
         screen = screens[self._current_screen_index]
+        old_widgets = screen.get(CONF_WIDGETS, [])
 
         if user_input is not None:
-            old_layout = screen.get(CONF_LAYOUT)
-            new_layout = user_input[CONF_LAYOUT]
-
-            # Preserve widgets in compatible slots if layout changes
-            old_widgets = screen.get(CONF_WIDGETS, [])
-            if old_layout != new_layout:
-                new_slot_count = LAYOUT_SLOT_COUNTS.get(new_layout, 4)
-                preserved_widgets = [w for w in old_widgets if w.get("slot", 0) < new_slot_count]
-            else:
-                preserved_widgets = old_widgets
+            layout = user_input[CONF_LAYOUT]
+            slot_count = LAYOUT_SLOT_COUNTS.get(layout, 4)
 
             self._screen_config = {
                 "name": user_input["name"],
-                CONF_LAYOUT: new_layout,
-                CONF_WIDGETS: preserved_widgets,
+                CONF_LAYOUT: layout,
+                CONF_WIDGETS: [],
             }
 
-            self._current_slot = 0
-            return await self.async_step_configure_slot()
+            # Collect widget types for non-empty slots
+            self._widget_types = {}
+            for i in range(slot_count):
+                widget_type = user_input.get(f"slot_{i}_type", "empty")
+                if widget_type != "empty":
+                    self._widget_types[i] = widget_type
 
-        return self.async_show_form(
-            step_id="edit_screen",
-            data_schema=vol.Schema(
-                {
-                    vol.Required("name", default=screen.get("name", "")): str,
-                    vol.Required(
-                        CONF_LAYOUT, default=screen.get(CONF_LAYOUT, LAYOUT_GRID_2X2)
-                    ): vol.In(LAYOUT_OPTIONS),
+            # If any widgets selected, go to configure them
+            if self._widget_types:
+                # Preserve existing widget configs for matching slots/types
+                self._existing_widgets = {
+                    w.get("slot"): w for w in old_widgets if w.get("slot") is not None
                 }
-            ),
-        )
-
-    async def async_step_configure_slot(
-        self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
-        """Configure a single slot."""
-        layout = self._screen_config[CONF_LAYOUT]
-        slot_count = LAYOUT_SLOT_COUNTS.get(layout, 4)
-
-        if user_input is not None:
-            widget_type = user_input["widget_type"]
-
-            if widget_type == "empty":
-                # Remove any existing widget for this slot
-                self._screen_config[CONF_WIDGETS] = [
-                    w
-                    for w in self._screen_config[CONF_WIDGETS]
-                    if w.get("slot") != self._current_slot
-                ]
-            else:
-                # Store widget type and proceed to widget options
-                self._current_widget_type = widget_type
-                self._current_widget_config = {
-                    "type": widget_type,
-                    "slot": self._current_slot,
-                }
-                return await self.async_step_widget_options()
-
-            # Move to next slot or finish
-            self._current_slot += 1
-            if self._current_slot < slot_count:
-                return await self.async_step_configure_slot()
+                return await self.async_step_configure_widgets()
+            # Otherwise finish with empty screen
             return await self._finish_screen_config()
 
-        # Get existing widget for this slot if editing
-        existing_widget = None
-        for w in self._screen_config.get(CONF_WIDGETS, []):
-            if w.get("slot") == self._current_slot:
-                existing_widget = w
-                break
-
-        default_type = existing_widget.get("type", "empty") if existing_widget else "empty"
-
-        # Build widget type options
+        # Build schema with current values as defaults
         widget_options = {"empty": "Empty (skip)"}
         widget_options.update(WIDGET_TYPE_NAMES)
 
-        return self.async_show_form(
-            step_id="configure_slot",
-            data_schema=vol.Schema(
-                {
-                    vol.Required("widget_type", default=default_type): vol.In(widget_options),
-                }
+        # Create slot -> widget type mapping from existing config
+        existing_types = {w.get("slot"): w.get("type") for w in old_widgets}
+
+        max_slots = max(LAYOUT_SLOT_COUNTS.values())
+        schema: dict[Any, Any] = {
+            vol.Required("name", default=screen.get("name", "")): str,
+            vol.Required(CONF_LAYOUT, default=screen.get(CONF_LAYOUT, LAYOUT_GRID_2X2)): vol.In(
+                LAYOUT_OPTIONS
             ),
-            description_placeholders={
-                "slot_number": str(self._current_slot + 1),
-                "total_slots": str(slot_count),
-                "layout_name": LAYOUT_OPTIONS.get(layout, layout),
-            },
+        }
+        for i in range(max_slots):
+            default_type = existing_types.get(i, "empty")
+            schema[vol.Optional(f"slot_{i}_type", default=default_type)] = vol.In(widget_options)
+
+        return self.async_show_form(
+            step_id="edit_screen",
+            data_schema=vol.Schema(schema),
         )
 
-    async def async_step_widget_options(
+    async def async_step_configure_widgets(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Configure widget-specific options."""
-        widget_type = self._current_widget_type
-        layout = self._screen_config[CONF_LAYOUT]
-        slot_count = LAYOUT_SLOT_COUNTS.get(layout, 4)
-
+        """Configure all widgets in one form."""
         if user_input is not None:
-            # Build complete widget config
-            widget_config = self._current_widget_config.copy()
-
-            # Extract entity_id if present
-            if user_input.get("entity_id"):
-                widget_config["entity_id"] = user_input.pop("entity_id")
-            elif "entity_id" in user_input:
-                user_input.pop("entity_id")
-
-            if user_input.get("label"):
-                widget_config["label"] = user_input.pop("label")
-            elif "label" in user_input:
-                user_input.pop("label")
-
-            # Remaining options go in options dict
-            if user_input:
-                widget_config["options"] = user_input
-
-            # Remove any existing widget for this slot and add new one
-            self._screen_config[CONF_WIDGETS] = [
-                w for w in self._screen_config[CONF_WIDGETS] if w.get("slot") != self._current_slot
-            ]
-            self._screen_config[CONF_WIDGETS].append(widget_config)
-
-            # Move to next slot
-            self._current_slot += 1
-
-            if self._current_slot < slot_count:
-                return await self.async_step_configure_slot()
+            # Extract widget configs from prefixed form fields
+            for slot, widget_type in self._widget_types.items():
+                widget_config = self._extract_widget_config(slot, widget_type, user_input)
+                self._screen_config[CONF_WIDGETS].append(widget_config)
             return await self._finish_screen_config()
 
-        # Get existing widget options if editing
-        existing_widget = None
-        for w in self._screen_config.get(CONF_WIDGETS, []):
-            if w.get("slot") == self._current_slot and w.get("type") == widget_type:
-                existing_widget = w
-                break
+        # Build schema with all widget options, prefixed by slot number
+        schema: dict[Any, Any] = {}
+        existing_widgets = getattr(self, "_existing_widgets", {})
 
-        # Build schema based on widget type
-        schema = self._get_widget_schema(widget_type, existing_widget)
+        for slot in sorted(self._widget_types.keys()):
+            widget_type = self._widget_types[slot]
+            # Get existing config if same widget type was in this slot
+            existing = existing_widgets.get(slot)
+            if existing and existing.get("type") != widget_type:
+                existing = None  # Different type, don't use old config
+            slot_schema = self._get_widget_schema_prefixed(slot, widget_type, existing)
+            schema.update(slot_schema)
 
         return self.async_show_form(
-            step_id="widget_options",
+            step_id="configure_widgets",
             data_schema=vol.Schema(schema),
-            description_placeholders={
-                "widget_type": WIDGET_TYPE_NAMES.get(widget_type, widget_type),
-                "slot_number": str(self._current_slot + 1),
-            },
         )
+
+    def _get_widget_schema_prefixed(
+        self, slot: int, widget_type: str, existing: dict[str, Any] | None = None
+    ) -> dict:
+        """Get widget schema with slot-prefixed field names."""
+        base_schema = self._get_widget_schema(widget_type, existing)
+        prefixed: dict[Any, Any] = {}
+
+        for key, validator in base_schema.items():
+            # Extract field name and required/optional status from voluptuous key
+            if isinstance(key, vol.Required):
+                field_name = key.schema
+                default = key.default if key.default is not vol.UNDEFINED else None
+                new_key = vol.Required(
+                    f"slot_{slot}_{field_name}",
+                    default=default,
+                    description=key.description,
+                )
+            elif isinstance(key, vol.Optional):
+                field_name = key.schema
+                default = key.default if key.default is not vol.UNDEFINED else None
+                new_key = vol.Optional(
+                    f"slot_{slot}_{field_name}",
+                    default=default,
+                    description=key.description,
+                )
+            else:
+                # Plain string key (shouldn't happen but handle it)
+                new_key = f"slot_{slot}_{key}"
+
+            prefixed[new_key] = validator
+
+        return prefixed
+
+    def _extract_widget_config(
+        self, slot: int, widget_type: str, user_input: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Extract widget config from prefixed form fields."""
+        prefix = f"slot_{slot}_"
+        config: dict[str, Any] = {"type": widget_type, "slot": slot}
+        options: dict[str, Any] = {}
+
+        for key, value in user_input.items():
+            if key.startswith(prefix):
+                field = key[len(prefix) :]
+                if field == "entity_id":
+                    if value:  # Only add if not empty
+                        config["entity_id"] = value
+                elif field == "label":
+                    if value:  # Only add if not empty
+                        config["label"] = value
+                else:
+                    # Handle special fields for multi_progress and status_list
+                    options[field] = value
+
+        # Convert numbered fields for multi_progress/status_list
+        if widget_type == "multi_progress":
+            items = []
+            for i in range(1, 4):
+                entity_id = options.pop(f"entity_id_{i}", "")
+                label = options.pop(f"label_{i}", "")
+                target = options.pop(f"target_{i}", 100)
+                if entity_id:
+                    items.append({"entity_id": entity_id, "label": label, "target": target})
+            if items:
+                options["items"] = items
+
+        elif widget_type == "status_list":
+            entities = []
+            for i in range(1, 5):
+                entity_id = options.pop(f"entity_id_{i}", "")
+                label = options.pop(f"label_{i}", "")
+                if entity_id:
+                    entities.append([entity_id, label] if label else entity_id)
+            if entities:
+                options["entities"] = entities
+
+        if options:
+            config["options"] = options
+
+        return config
 
     def _get_widget_schema(  # noqa: PLR0911
         self, widget_type: str, existing: dict[str, Any] | None = None
@@ -598,35 +628,6 @@ class GeekMagicOptionsFlow(config_entries.OptionsFlow):
             widget_count,
         )
         screens = self._options.get(CONF_SCREENS, [])
-
-        # Handle multi_progress and status_list special conversion
-        for widget in self._screen_config.get(CONF_WIDGETS, []):
-            options = widget.get("options", {})
-
-            if widget.get("type") == "multi_progress":
-                # Convert numbered fields to items list
-                items = []
-                for i in range(1, 4):
-                    entity_id = options.pop(f"entity_id_{i}", "")
-                    label = options.pop(f"label_{i}", "")
-                    target = options.pop(f"target_{i}", 100)
-                    if entity_id:
-                        items.append({"entity_id": entity_id, "label": label, "target": target})
-                if items:
-                    options["items"] = items
-                widget["options"] = options
-
-            elif widget.get("type") == "status_list":
-                # Convert numbered fields to entities list
-                entities = []
-                for i in range(1, 5):
-                    entity_id = options.pop(f"entity_id_{i}", "")
-                    label = options.pop(f"label_{i}", "")
-                    if entity_id:
-                        entities.append([entity_id, label] if label else entity_id)
-                if entities:
-                    options["entities"] = entities
-                widget["options"] = options
 
         if self._editing_screen and self._current_screen_index < len(screens):
             # Editing existing screen

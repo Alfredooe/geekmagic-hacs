@@ -104,6 +104,8 @@ async def async_options_update_listener(hass: HomeAssistant, entry: ConfigEntry)
     _LOGGER.debug("Options updated for GeekMagic device %s", host)
     coordinator: GeekMagicCoordinator = hass.data[DOMAIN][entry.entry_id]
     coordinator.update_options(dict(entry.options))
+    # Trigger immediate refresh so device displays updated config
+    await coordinator.async_request_refresh()
 
 
 async def async_setup_services(hass: HomeAssistant) -> None:

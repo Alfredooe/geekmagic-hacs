@@ -139,7 +139,8 @@ class TestOptionsFlowInit:
         assert flow is not None
         assert flow._options == {}
         assert flow._current_screen_index == 0
-        assert flow._current_slot == 0
+        assert flow._widget_types == {}
+        assert flow._editing_screen is False
 
     def test_migrate_empty_options(self):
         """Test migration handles empty options."""
