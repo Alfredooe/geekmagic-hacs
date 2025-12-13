@@ -56,7 +56,8 @@ def BarGauge(
     """
     header_children: list[Component | None] = []
     if icon:
-        header_children.append(Icon(icon, color=color))
+        # Fixed 16px icon size for header to prevent oversized icons
+        header_children.append(Icon(icon, size=16, color=color))
     header_children.extend(
         [
             Text(label.upper(), font="tiny", color=COLOR_GRAY),
@@ -171,13 +172,19 @@ def IconValue(
         color: Icon color
         value_color: Value text color
         label_color: Label text color
-        icon_size: Optional fixed icon size (default: auto-size but min 16)
+        icon_size: Optional fixed icon size (default: auto-size with max 24px)
 
     Returns:
         Component tree using Adaptive for responsive layout
     """
-    # Use fixed icon size to prevent extreme scaling
-    icon_component = Icon(icon, size=icon_size or 24, color=color)
+    # Use Icon's auto-sizing with max constraint if no explicit size given
+    # This allows container-aware sizing while preventing oversized icons
+    if icon_size is not None:
+        icon_component = Icon(icon, size=icon_size, color=color)
+    else:
+        # Auto-size with max 24px - Icon component has min_size=12, max_size=32 default
+        icon_component = Icon(icon, color=color, max_size=24)
+
     value_component = Text(value, font="medium", bold=True, color=value_color)
     label_component = Text(label.upper(), font="small", color=label_color)
 
@@ -293,8 +300,8 @@ def StatusIndicator(
             Row(
                 gap=6,
                 children=[
-                    # Status indicator icon - larger for visibility on small display
-                    Icon("check" if is_on else "warning", size=12, color=color),
+                    # Status indicator icon - 14px for visibility on small display
+                    Icon("check" if is_on else "warning", size=14, color=color),
                     Text(label, font="small", color=COLOR_WHITE),
                 ],
             ),
@@ -324,7 +331,8 @@ def ProgressRow(
     """
     header_children: list[Component | None] = []
     if icon:
-        header_children.append(Icon(icon, color=color))
+        # Fixed 14px icon for progress row header
+        header_children.append(Icon(icon, size=14, color=color))
     header_children.extend(
         [
             Text(label.upper(), font="tiny", color=COLOR_GRAY),

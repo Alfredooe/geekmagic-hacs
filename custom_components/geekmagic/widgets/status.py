@@ -47,7 +47,8 @@ class StatusWidget(Widget):
         # Calculate relative padding and sizes
         padding = int(ctx.width * 0.06)
         dot_radius = max(3, int(ctx.height * 0.12))
-        icon_size = max(10, int(ctx.height * 0.35))
+        # Icon at 20% of height, capped at 20px to prevent dominating small cells
+        icon_size = max(10, min(20, int(ctx.height * 0.20)))
 
         # Get entity state
         state = self.get_entity_state(hass)

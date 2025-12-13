@@ -133,22 +133,34 @@ class Text(Component):
 
 @dataclass
 class Icon(Component):
-    """Icon component with optional fixed size."""
+    """Icon component with optional fixed size.
+
+    Args:
+        name: Icon name (e.g., "cpu", "temp", "lock")
+        size: Fixed size in pixels, or None for auto-sizing
+        color: Icon color as RGB tuple
+        min_size: Minimum size for readability (default 12px)
+        max_size: Maximum size to prevent icons dominating layout (default 32px)
+    """
 
     name: str
     size: int | None = None  # None = auto-size to container
     color: Color = COLOR_WHITE
     min_size: int = 12  # Minimum size for readability
+    max_size: int = 32  # Maximum size to prevent oversized icons
+
+    def _calculate_size(self, available: int) -> int:
+        """Calculate icon size with min/max bounds."""
+        if self.size is not None:
+            return self.size
+        return max(self.min_size, min(self.max_size, available))
 
     def measure(self, ctx: RenderContext, max_width: int, max_height: int) -> tuple[int, int]:
-        if self.size is not None:
-            size = self.size
-        else:
-            size = max(self.min_size, min(max_width, max_height))
+        size = self._calculate_size(min(max_width, max_height))
         return (size, size)
 
     def render(self, ctx: RenderContext, x: int, y: int, width: int, height: int) -> None:
-        size = self.size if self.size is not None else max(self.min_size, min(width, height))
+        size = self._calculate_size(min(width, height))
         # Center icon in available space
         ix = x + (width - size) // 2
         iy = y + (height - size) // 2

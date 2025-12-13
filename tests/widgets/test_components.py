@@ -70,10 +70,17 @@ class TestIcon:
     """Tests for Icon component."""
 
     def test_measure_auto_size(self, mock_ctx: MagicMock) -> None:
-        """Test icon auto-sizing to container."""
-        icon = Icon("cpu")
+        """Test icon auto-sizing to container with max_size constraint."""
+        icon = Icon("cpu")  # default max_size=32
         w, h = icon.measure(mock_ctx, 100, 80)
-        assert w == 80  # min(100, 80)
+        assert w == 32  # capped at max_size
+        assert h == 32
+
+    def test_measure_auto_size_custom_max(self, mock_ctx: MagicMock) -> None:
+        """Test icon auto-sizing with custom max_size."""
+        icon = Icon("cpu", max_size=80)
+        w, h = icon.measure(mock_ctx, 100, 80)
+        assert w == 80  # min(100, 80, max_size=80)
         assert h == 80
 
     def test_measure_fixed_size(self, mock_ctx: MagicMock) -> None:

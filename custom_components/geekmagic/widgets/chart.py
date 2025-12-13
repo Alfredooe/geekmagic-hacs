@@ -72,23 +72,31 @@ class ChartWidget(Widget):
         chart_bottom = ctx.height - footer_height
         chart_rect = (padding, chart_top, ctx.width - padding, chart_bottom)
 
-        # Draw label
+        # Draw header with label and value
+        # Use horizontal layout (label left, value right) to prevent overlap
+        header_y = int(ctx.height * 0.08)
+
         if self.config.label:
-            center_x = ctx.width // 2
+            # For small containers (<100px), truncate label
+            max_label_len = max(3, ctx.width // 12)
+            display_name = name.upper()
+            if len(display_name) > max_label_len:
+                display_name = display_name[: max_label_len - 2] + ".."
+
             ctx.draw_text(
-                name.upper(),
-                (center_x, int(ctx.height * 0.08)),
+                display_name,
+                (padding, header_y),
                 font=font_label,
                 color=COLOR_GRAY,
-                anchor="mm",
+                anchor="lm",  # Left-align to prevent overlap with value
             )
 
-        # Draw current value
+        # Draw current value (always right-aligned)
         if self.show_value and current_value is not None:
             value_str = f"{current_value:.1f}{unit}"
             ctx.draw_text(
                 value_str,
-                (ctx.width - padding, int(ctx.height * 0.08)),
+                (ctx.width - padding, header_y),
                 font=font_value,
                 color=self.config.color or COLOR_CYAN,
                 anchor="rm",

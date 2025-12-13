@@ -77,10 +77,10 @@ WIDGET_TYPE_NAMES = {
 # Base colors
 COLOR_WHITE = (255, 255, 255)
 COLOR_BLACK = (0, 0, 0)
-COLOR_GRAY = (100, 100, 100)
-COLOR_DARK_GRAY = (40, 40, 40)
+COLOR_GRAY = (150, 150, 150)  # Increased from 100 for WCAG AA contrast (4.7x vs 3.5x)
+COLOR_DARK_GRAY = (50, 50, 50)  # Increased from 40 for better visibility
 COLOR_PANEL = (18, 18, 18)
-COLOR_PANEL_BORDER = (50, 50, 50)
+COLOR_PANEL_BORDER = (60, 60, 60)  # Increased from 50 for better contrast
 
 # Primary UI colors from Bold_6 palette (vibrant, distinguishable)
 # Bold_6: Purple, Teal, Blue, Yellow, Pink, Green
@@ -105,3 +105,25 @@ COLOR_RED = (231, 76, 60)  # Custom red for alerts/errors
 PLACEHOLDER_VALUE = "--"
 PLACEHOLDER_TEXT = "No data"
 PLACEHOLDER_NAME = "Unknown"
+
+# Spacing constants for consistent layout (in pixels)
+# Use these in component helpers and widgets for uniform spacing
+SPACING_XS = 2  # Extra small - tight spacing between related items
+SPACING_SM = 4  # Small - default gap between small elements
+SPACING_MD = 6  # Medium - standard gap between components
+SPACING_LG = 8  # Large - padding around content
+SPACING_XL = 12  # Extra large - major section separation
+
+# Responsive padding percentages (as decimals)
+# Multiply by container width to get pixel value
+PADDING_COMPACT = 0.04  # 4% for dense layouts (3x3 grids)
+PADDING_STANDARD = 0.06  # 6% for normal layouts (2x2 grids)
+PADDING_SPACIOUS = 0.08  # 8% for layouts with breathing room (1x1, split)
+
+# Icon sizing constants
+ICON_SIZE_XS = 12  # Extra small icons (status dots)
+ICON_SIZE_SM = 14  # Small icons (inline with text)
+ICON_SIZE_MD = 16  # Medium icons (headers, labels)
+ICON_SIZE_LG = 20  # Large icons (primary display)
+ICON_SIZE_XL = 24  # Extra large icons (hero widgets)
+ICON_SIZE_MAX = 32  # Maximum auto-size bound
