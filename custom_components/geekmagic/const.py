@@ -33,6 +33,7 @@ LAYOUT_SPLIT = "split"
 LAYOUT_THREE_COLUMN = "three_column"
 
 # Widget types
+WIDGET_CAMERA = "camera"
 WIDGET_CLOCK = "clock"
 WIDGET_ENTITY = "entity"
 WIDGET_MEDIA = "media"
@@ -56,6 +57,7 @@ LAYOUT_SLOT_COUNTS = {
 
 # Widget type display names for UI
 WIDGET_TYPE_NAMES = {
+    WIDGET_CAMERA: "Camera",
     WIDGET_CLOCK: "Clock",
     WIDGET_ENTITY: "Entity",
     WIDGET_MEDIA: "Media Player",

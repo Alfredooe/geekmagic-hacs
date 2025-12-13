@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING
 from .const import COLOR_DARK_GRAY, COLOR_PANEL, COLOR_WHITE
 
 if TYPE_CHECKING:
-    from PIL import ImageDraw
+    from PIL import Image, ImageDraw
     from PIL.ImageFont import FreeTypeFont, ImageFont
 
     from .renderer import Renderer
@@ -392,6 +392,25 @@ class RenderContext:
         """
         abs_xy = [self._abs_point(*p) for p in xy]
         self._renderer.draw_line(self._draw, abs_xy, fill=fill, width=width)
+
+    def draw_image(
+        self,
+        source: Image.Image,  # type: ignore[name-defined]
+        rect: tuple[int, int, int, int] | None = None,
+        preserve_aspect: bool = True,
+    ) -> None:
+        """Draw/paste an image in local coordinates.
+
+        Args:
+            source: PIL Image to paste
+            rect: (x1, y1, x2, y2) destination in local coordinates.
+                  If None, fills the entire widget area.
+            preserve_aspect: If True, preserve aspect ratio and center
+        """
+        if rect is None:
+            rect = (0, 0, self.width, self.height)
+        abs_rect = self._abs_rect(rect)
+        self._renderer.draw_image(self._draw, source, abs_rect, preserve_aspect=preserve_aspect)
 
     # =========================================================================
     # Color Utilities

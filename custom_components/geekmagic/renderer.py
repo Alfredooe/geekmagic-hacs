@@ -191,6 +191,55 @@ class Renderer:
         """Downscale supersampled image to final resolution with anti-aliasing."""
         return img.resize((self.width, self.height), Image.Resampling.LANCZOS)
 
+    def draw_image(
+        self,
+        draw: ImageDraw.ImageDraw,
+        source: Image.Image,
+        rect: tuple[int, int, int, int],
+        preserve_aspect: bool = True,
+    ) -> None:
+        """Draw/paste an image onto the canvas.
+
+        Args:
+            draw: ImageDraw instance (used to get underlying image)
+            source: Source PIL Image to paste
+            rect: (x1, y1, x2, y2) destination rectangle (will be scaled)
+            preserve_aspect: If True, preserve aspect ratio and center
+        """
+        # Get the underlying image from the draw object
+        canvas = draw._image  # noqa: SLF001
+
+        # Scale the destination rect
+        x1, y1, x2, y2 = self._scale_rect(rect)
+        dest_width = x2 - x1
+        dest_height = y2 - y1
+
+        if preserve_aspect:
+            # Calculate size preserving aspect ratio
+            src_ratio = source.width / source.height
+            dest_ratio = dest_width / dest_height
+
+            if src_ratio > dest_ratio:
+                # Source is wider - fit to width
+                new_width = dest_width
+                new_height = int(dest_width / src_ratio)
+            else:
+                # Source is taller - fit to height
+                new_height = dest_height
+                new_width = int(dest_height * src_ratio)
+
+            # Center the image
+            offset_x = (dest_width - new_width) // 2
+            offset_y = (dest_height - new_height) // 2
+
+            # Resize and paste
+            resized = source.resize((new_width, new_height), Image.Resampling.LANCZOS)
+            canvas.paste(resized, (x1 + offset_x, y1 + offset_y))
+        else:
+            # Stretch to fill
+            resized = source.resize((dest_width, dest_height), Image.Resampling.LANCZOS)
+            canvas.paste(resized, (x1, y1))
+
     def draw_text(
         self,
         draw: ImageDraw.ImageDraw,

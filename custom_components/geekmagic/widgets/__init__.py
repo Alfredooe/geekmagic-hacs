@@ -1,6 +1,7 @@
 """Widget components for GeekMagic displays."""
 
 from .base import Widget, WidgetConfig
+from .camera import CameraWidget
 from .chart import ChartWidget
 from .clock import ClockWidget
 from .entity import EntityWidget
@@ -12,6 +13,7 @@ from .text import TextWidget
 from .weather import WeatherWidget
 
 __all__ = [
+    "CameraWidget",
     "ChartWidget",
     "ClockWidget",
     "EntityWidget",

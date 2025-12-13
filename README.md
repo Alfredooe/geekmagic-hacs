@@ -29,7 +29,7 @@ A Home Assistant custom integration for GeekMagic displays (SmallTV Pro and simi
 
 ## Features
 
-- **11 widget types**: Clock, entity, media, chart, text, gauge, progress, weather, status, and more
+- **12 widget types**: Clock, entity, media, chart, text, gauge, progress, weather, status, camera, and more
 - **7 layout options**: Grid (2x2, 2x3, 3x3), hero, split (vertical/horizontal), three-column
 - **Pure Python rendering**: Uses Pillow for image generation (no browser required)
 - **Configurable refresh**: Updates every 5-300 seconds
@@ -81,6 +81,7 @@ Go to the integration options to add screens and widgets. Changes are applied im
 
 | Widget | Type | Description |
 |--------|------|-------------|
+| Camera | `camera` | Camera snapshot display |
 | Clock | `clock` | Current time and date |
 | Entity | `entity` | Any Home Assistant entity value |
 | Media | `media` | Now playing from media player |
@@ -94,6 +95,15 @@ Go to the integration options to add screens and widgets. Changes are applied im
 | Status List | `status_list` | Multiple status indicators |
 
 ### Widget Examples
+
+#### Camera
+
+Displays a camera entity snapshot.
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `show_label` | bool | `false` | Show camera name label |
+| `fit` | string | `"contain"` | `"contain"` (preserve aspect) or `"cover"` (fill) |
 
 #### Clock
 <img src="samples/widgets/widget_clock.png" alt="Clock Widget" width="120">

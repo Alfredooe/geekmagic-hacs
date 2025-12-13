@@ -36,6 +36,7 @@ from .layouts.hero import HeroLayout
 from .layouts.split import SplitLayout, ThreeColumnLayout
 from .renderer import Renderer
 from .widgets.base import WidgetConfig
+from .widgets.camera import CameraWidget
 from .widgets.chart import ChartWidget
 from .widgets.clock import ClockWidget
 from .widgets.entity import EntityWidget
@@ -60,6 +61,7 @@ LAYOUT_CLASSES = {
 }
 
 WIDGET_CLASSES = {
+    "camera": CameraWidget,
     "clock": ClockWidget,
     "entity": EntityWidget,
     "media": MediaWidget,

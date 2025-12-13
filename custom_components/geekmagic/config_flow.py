@@ -453,6 +453,20 @@ class GeekMagicOptionsFlow(config_entries.OptionsFlow):
         existing = existing or {}
         options = existing.get("options", {})
 
+        if widget_type == "camera":
+            return {
+                vol.Required(
+                    "entity_id", default=existing.get("entity_id", "")
+                ): selector.EntitySelector(selector.EntitySelectorConfig(domain="camera")),
+                vol.Optional("label", default=existing.get("label", "")): str,
+                vol.Optional("show_label", default=options.get("show_label", False)): bool,
+                vol.Optional("fit", default=options.get("fit", "contain")): vol.In(
+                    {
+                        "contain": "Contain (preserve aspect)",
+                        "cover": "Cover (fill area)",
+                    }
+                ),
+            }
         if widget_type == "clock":
             return {
                 vol.Optional("label", default=existing.get("label", "")): str,
