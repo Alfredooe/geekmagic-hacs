@@ -20,7 +20,8 @@ if TYPE_CHECKING:
 
 
 # Template definitions
-# Each template defines a layout and pre-configured widgets with hints for entity binding
+# Each template defines a layout and pre-configured widgets
+# Labels are NOT set - widgets infer labels from entity friendly_name
 SCREEN_TEMPLATES: dict[str, dict[str, Any]] = {
     "system_monitor": {
         "name": "System Monitor",
@@ -30,28 +31,24 @@ SCREEN_TEMPLATES: dict[str, dict[str, Any]] = {
             {
                 "slot": 0,
                 "type": "gauge",
-                "label": "CPU",
                 "options": {"style": "ring", "min": 0, "max": 100, "unit": "%"},
                 "hint": "CPU usage sensor (e.g., sensor.processor_use)",
             },
             {
                 "slot": 1,
                 "type": "gauge",
-                "label": "Memory",
                 "options": {"style": "ring", "min": 0, "max": 100, "unit": "%"},
                 "hint": "Memory usage sensor (e.g., sensor.memory_use_percent)",
             },
             {
                 "slot": 2,
                 "type": "gauge",
-                "label": "Disk",
                 "options": {"style": "ring", "min": 0, "max": 100, "unit": "%"},
                 "hint": "Disk usage sensor (e.g., sensor.disk_use_percent)",
             },
             {
                 "slot": 3,
                 "type": "chart",
-                "label": "Network",
                 "options": {"hours": 24, "show_value": True, "show_range": False},
                 "hint": "Network sensor (e.g., sensor.speedtest_download)",
             },
@@ -65,42 +62,36 @@ SCREEN_TEMPLATES: dict[str, dict[str, Any]] = {
             {
                 "slot": 0,
                 "type": "entity",
-                "label": "Temp",
                 "options": {"show_name": True, "show_unit": True, "icon": "thermometer"},
                 "hint": "Temperature sensor",
             },
             {
                 "slot": 1,
                 "type": "entity",
-                "label": "Humidity",
                 "options": {"show_name": True, "show_unit": True, "icon": "drop"},
                 "hint": "Humidity sensor",
             },
             {
                 "slot": 2,
                 "type": "entity",
-                "label": "Lights",
                 "options": {"show_name": True, "icon": "bulb"},
                 "hint": "Light entity or group",
             },
             {
                 "slot": 3,
                 "type": "status",
-                "label": "Motion",
                 "options": {"icon": "motion", "on_text": "Motion", "off_text": "Clear"},
                 "hint": "Motion sensor",
             },
             {
                 "slot": 4,
                 "type": "status",
-                "label": "Door",
                 "options": {"icon": "door", "on_text": "Open", "off_text": "Closed"},
                 "hint": "Door sensor",
             },
             {
                 "slot": 5,
                 "type": "status",
-                "label": "Home",
                 "options": {"icon": "home", "on_text": "Home", "off_text": "Away"},
                 "hint": "Presence sensor or person entity",
             },
@@ -120,21 +111,18 @@ SCREEN_TEMPLATES: dict[str, dict[str, Any]] = {
             {
                 "slot": 1,
                 "type": "entity",
-                "label": "Indoor",
                 "options": {"show_name": True, "show_unit": True, "icon": "thermometer"},
                 "hint": "Indoor temperature sensor",
             },
             {
                 "slot": 2,
                 "type": "entity",
-                "label": "Humidity",
                 "options": {"show_name": True, "show_unit": True, "icon": "drop"},
                 "hint": "Indoor humidity sensor",
             },
             {
                 "slot": 3,
                 "type": "entity",
-                "label": "UV",
                 "options": {"show_name": True, "icon": "sun"},
                 "hint": "UV index or outdoor condition",
             },
@@ -154,7 +142,6 @@ SCREEN_TEMPLATES: dict[str, dict[str, Any]] = {
             {
                 "slot": 1,
                 "type": "entity",
-                "label": "Volume",
                 "options": {"show_name": True, "show_unit": True},
                 "hint": "Volume level (media_player attribute)",
             },
@@ -166,7 +153,6 @@ SCREEN_TEMPLATES: dict[str, dict[str, Any]] = {
             {
                 "slot": 3,
                 "type": "entity",
-                "label": "Source",
                 "options": {"show_name": True},
                 "hint": "Media source (media_player attribute)",
             },
@@ -185,21 +171,18 @@ SCREEN_TEMPLATES: dict[str, dict[str, Any]] = {
             {
                 "slot": 1,
                 "type": "entity",
-                "label": "Temp",
                 "options": {"show_name": True, "show_unit": True, "icon": "thermometer"},
                 "hint": "Temperature sensor",
             },
             {
                 "slot": 2,
                 "type": "entity",
-                "label": "Weather",
                 "options": {"show_name": True},
                 "hint": "Weather condition or outdoor temp",
             },
             {
                 "slot": 3,
                 "type": "status",
-                "label": "Home",
                 "options": {"icon": "home", "on_text": "Home", "off_text": "Away"},
                 "hint": "Presence indicator",
             },
@@ -213,28 +196,24 @@ SCREEN_TEMPLATES: dict[str, dict[str, Any]] = {
             {
                 "slot": 0,
                 "type": "gauge",
-                "label": "Power",
                 "options": {"style": "arc", "min": 0, "max": 5000, "unit": "W"},
                 "hint": "Current power usage sensor",
             },
             {
                 "slot": 1,
                 "type": "chart",
-                "label": "Today",
                 "options": {"hours": 24, "show_value": True, "show_range": True},
                 "hint": "Energy consumption sensor",
             },
             {
                 "slot": 2,
                 "type": "entity",
-                "label": "Cost",
                 "options": {"show_name": True, "show_unit": True},
                 "hint": "Energy cost sensor or utility meter",
             },
             {
                 "slot": 3,
                 "type": "status",
-                "label": "Grid",
                 "options": {"icon": "bolt", "on_text": "Import", "off_text": "Export"},
                 "hint": "Grid import/export status",
             },
@@ -254,35 +233,30 @@ SCREEN_TEMPLATES: dict[str, dict[str, Any]] = {
             {
                 "slot": 1,
                 "type": "status",
-                "label": "Front Door",
                 "options": {"icon": "door", "on_text": "Open", "off_text": "Closed"},
                 "hint": "Front door sensor",
             },
             {
                 "slot": 2,
                 "type": "status",
-                "label": "Back Door",
                 "options": {"icon": "door", "on_text": "Open", "off_text": "Closed"},
                 "hint": "Back door sensor",
             },
             {
                 "slot": 3,
                 "type": "status",
-                "label": "Motion",
                 "options": {"icon": "motion", "on_text": "Detected", "off_text": "Clear"},
                 "hint": "Motion sensor",
             },
             {
                 "slot": 4,
                 "type": "status",
-                "label": "Alarm",
                 "options": {"icon": "alarm", "on_text": "Armed", "off_text": "Disarmed"},
                 "hint": "Alarm panel state",
             },
             {
                 "slot": 5,
                 "type": "status",
-                "label": "Lock",
                 "options": {"icon": "lock", "on_text": "Locked", "off_text": "Unlocked"},
                 "hint": "Smart lock state",
             },
@@ -296,14 +270,12 @@ SCREEN_TEMPLATES: dict[str, dict[str, Any]] = {
             {
                 "slot": 0,
                 "type": "gauge",
-                "label": "Temperature",
                 "options": {"style": "arc", "min": 10, "max": 35, "unit": "°"},
                 "hint": "Current temperature from climate entity",
             },
             {
                 "slot": 1,
                 "type": "gauge",
-                "label": "Humidity",
                 "options": {"style": "arc", "min": 0, "max": 100, "unit": "%"},
                 "hint": "Current humidity sensor",
             },
@@ -372,15 +344,14 @@ async def apply_template(
     screens[screen_index]["name"] = template.get("name", screens[screen_index].get("name"))
     screens[screen_index][CONF_LAYOUT] = template["layout"]
 
-    # Create widgets from template (without entity bindings)
+    # Create widgets from template (without labels - they'll be inferred from entities)
     widgets = []
     for widget_template in template.get("widgets", []):
         widget = {
             "type": widget_template["type"],
             "slot": widget_template["slot"],
         }
-        if "label" in widget_template:
-            widget["label"] = widget_template["label"]
+        # Don't copy label - let widget infer from entity friendly_name
         if "options" in widget_template:
             widget["options"] = dict(widget_template["options"])
         widgets.append(widget)
