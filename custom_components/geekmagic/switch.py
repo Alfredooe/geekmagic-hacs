@@ -110,7 +110,10 @@ async def async_setup_entry(
 
                         if entity_key not in current_entity_ids:
                             current_entity_ids.add(entity_key)
-                            name = f"Screen {screen_idx + 1} Slot {slot_idx + 1} {display_name}"
+                            # "Opt:" prefix sorts after Display, Entity, Label
+                            name = (
+                                f"Screen {screen_idx + 1} Slot {slot_idx + 1} Opt: {display_name}"
+                            )
                             entities_to_add.append(
                                 GeekMagicWidgetOptionSwitch(
                                     coordinator,

@@ -271,8 +271,9 @@ class GeekMagicScreenTemplateSelect(GeekMagicSelectEntity):
         """Return entity name with screen context."""
         screen_idx = self.entity_description.screen_index
         if screen_idx is not None:
-            return f"Screen {screen_idx + 1} Template"
-        return "Template"
+            # "Apply" sorts before "Layout" and "Name"
+            return f"Screen {screen_idx + 1} Apply Template"
+        return "Apply Template"
 
 
 class GeekMagicScreenLayoutSelect(GeekMagicSelectEntity):
@@ -415,8 +416,9 @@ class GeekMagicSlotWidgetSelect(GeekMagicSelectEntity):
         screen_idx = self.entity_description.screen_index
         slot_idx = self.entity_description.slot_index
         if screen_idx is not None and slot_idx is not None:
-            return f"Screen {screen_idx + 1} Slot {slot_idx + 1} Widget"
-        return "Widget"
+            # "Display" sorts before "Entity" and "Label"
+            return f"Screen {screen_idx + 1} Slot {slot_idx + 1} Display"
+        return "Display"
 
 
 # Domain filters for each widget type
