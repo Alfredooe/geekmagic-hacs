@@ -18,19 +18,23 @@ if TYPE_CHECKING:
     from ..render_context import RenderContext
 
 
-# Map weather conditions to icons
+# Map HA weather conditions to MDI icon names
 WEATHER_ICONS = {
-    "sunny": "sun",
-    "clear-night": "moon",
-    "partlycloudy": "cloud",
-    "cloudy": "cloud",
-    "rainy": "rain",
-    "pouring": "rain",
-    "snowy": "cloud",
-    "fog": "cloud",
-    "windy": "wind",
-    "lightning": "bolt",
-    "lightning-rainy": "bolt",
+    "sunny": "weather-sunny",
+    "clear-night": "weather-night",
+    "partlycloudy": "weather-partly-cloudy",
+    "cloudy": "weather-cloudy",
+    "rainy": "weather-rainy",
+    "pouring": "weather-pouring",
+    "snowy": "weather-snowy",
+    "snowy-rainy": "weather-snowy-rainy",
+    "fog": "weather-fog",
+    "hail": "weather-hail",
+    "windy": "weather-windy",
+    "windy-variant": "weather-windy-variant",
+    "lightning": "weather-lightning",
+    "lightning-rainy": "weather-lightning-rainy",
+    "exceptional": "alert-circle",
 }
 
 
@@ -85,7 +89,7 @@ class WeatherWidget(Widget):
         forecast = attrs.get("forecast", [])
 
         # Get weather icon
-        icon_name = WEATHER_ICONS.get(condition, "sun")
+        icon_name = WEATHER_ICONS.get(condition, "weather-sunny")
 
         # Layout depends on available space (use relative threshold)
         if ctx.height > 120 and self.show_forecast:
@@ -147,7 +151,7 @@ class WeatherWidget(Widget):
             humidity_icon_size = max(8, int(ctx.height * 0.07))
             humidity_y = current_y + icon_size + int(ctx.height * 0.30)
             ctx.draw_icon(
-                "drop",
+                "water-percent",
                 (padding, humidity_y),
                 size=humidity_icon_size,
                 color=COLOR_CYAN,
@@ -184,7 +188,7 @@ class WeatherWidget(Widget):
                     )
 
                     # Small icon
-                    day_icon = WEATHER_ICONS.get(day_condition, "sun")
+                    day_icon = WEATHER_ICONS.get(day_condition, "weather-sunny")
                     ctx.draw_icon(
                         day_icon,
                         (fx - forecast_icon_size // 2, forecast_y + int(ctx.height * 0.05)),

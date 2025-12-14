@@ -113,7 +113,7 @@ def generate_widget_sizes(renderer: Renderer, output_dir: Path) -> None:
                 entity_id="sensor.cpu",
                 label="CPU",
                 color=COLOR_CYAN,
-                options={"style": "bar", "icon": "cpu"},
+                options={"style": "bar", "icon": "chip"},
             )
         )
 
@@ -149,7 +149,7 @@ def generate_widget_sizes(renderer: Renderer, output_dir: Path) -> None:
                 entity_id="sensor.temp",
                 label="Temperature",
                 color=COLOR_ORANGE,
-                options={"icon": "temp"},
+                options={"icon": "thermometer"},
             )
         )
 
@@ -307,7 +307,7 @@ def generate_system_monitor(renderer: Renderer, output_dir: Path) -> None:
             entity_id="sensor.cpu_usage",
             label="CPU",
             color=COLOR_TEAL,
-            options={"style": "ring", "max": 100, "icon": "cpu"},
+            options={"style": "ring", "max": 100, "icon": "chip"},
         )
     )
     layout.set_widget(0, cpu_widget)
@@ -333,7 +333,7 @@ def generate_system_monitor(renderer: Renderer, output_dir: Path) -> None:
             entity_id="sensor.disk_usage",
             label="Disk",
             color=COLOR_ORANGE,
-            options={"style": "bar", "max": 100, "icon": "disk"},
+            options={"style": "bar", "max": 100, "icon": "harddisk"},
         )
     )
     layout.set_widget(2, disk_widget)
@@ -423,7 +423,7 @@ def generate_smart_home(renderer: Renderer, output_dir: Path) -> None:
             slot=4,
             entity_id="sensor.humidity",
             color=COLOR_CYAN,
-            options={"show_name": True, "show_unit": True, "icon": "drop", "show_panel": True},
+            options={"show_name": True, "show_unit": True, "icon": "water", "show_panel": True},
         )
     )
     layout.set_widget(4, humidity)
@@ -488,7 +488,7 @@ def generate_server_stats(renderer: Renderer, output_dir: Path) -> None:
             entity_id="sensor.server_cpu",
             label="CPU",
             color=COLOR_TEAL,
-            options={"style": "bar", "icon": "cpu"},
+            options={"style": "bar", "icon": "chip"},
         )
     )
     layout.set_widget(0, cpu)
@@ -512,7 +512,7 @@ def generate_server_stats(renderer: Renderer, output_dir: Path) -> None:
             entity_id="sensor.server_disk",
             label="DISK",
             color=COLOR_ORANGE,
-            options={"style": "bar", "icon": "disk"},
+            options={"style": "bar", "icon": "harddisk"},
         )
     )
     layout.set_widget(2, disk)
@@ -600,7 +600,7 @@ def generate_energy_monitor(renderer: Renderer, output_dir: Path) -> None:
             entity_id="sensor.energy_consumption",
             label="Using",
             color=COLOR_ORANGE,
-            options={"icon": "bolt", "show_panel": True},
+            options={"icon": "lightning-bolt", "show_panel": True},
         )
     )
     layout.set_widget(0, consumption)
@@ -613,7 +613,7 @@ def generate_energy_monitor(renderer: Renderer, output_dir: Path) -> None:
             entity_id="sensor.solar_production",
             label="Solar",
             color=COLOR_GOLD,
-            options={"icon": "sun", "show_panel": True},
+            options={"icon": "weather-sunny", "show_panel": True},
         )
     )
     layout.set_widget(1, solar)
@@ -639,7 +639,7 @@ def generate_energy_monitor(renderer: Renderer, output_dir: Path) -> None:
             entity_id="sensor.energy_today",
             label="Today",
             color=COLOR_CYAN,
-            options={"icon": "bolt", "show_panel": True},
+            options={"icon": "lightning-bolt", "show_panel": True},
         )
     )
     layout.set_widget(3, today)
@@ -670,7 +670,7 @@ def generate_fitness(renderer: Renderer, output_dir: Path) -> None:
                         "target": 800,
                         "color": COLOR_RED,
                         "unit": "cal",
-                        "icon": "flame",
+                        "icon": "fire",
                     },
                     {
                         "entity_id": "sensor.exercise_minutes",
@@ -678,7 +678,7 @@ def generate_fitness(renderer: Renderer, output_dir: Path) -> None:
                         "target": 40,
                         "color": COLOR_LIME,
                         "unit": "min",
-                        "icon": "steps",
+                        "icon": "walk",
                     },
                     {
                         "entity_id": "sensor.stand_hours",

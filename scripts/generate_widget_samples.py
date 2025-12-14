@@ -145,7 +145,7 @@ def generate_entity_icon(renderer: Renderer, output_dir: Path) -> None:
             slot=0,
             entity_id="sensor.humidity",
             color=COLOR_CYAN,
-            options={"show_name": True, "show_unit": True, "icon": "drop", "show_panel": True},
+            options={"show_name": True, "show_unit": True, "icon": "water", "show_panel": True},
         )
     )
 
@@ -240,7 +240,7 @@ def generate_progress(renderer: Renderer, output_dir: Path) -> None:
             entity_id="sensor.calories",
             label="Move",
             color=COLOR_RED,
-            options={"target": 800, "unit": "cal", "icon": "flame"},
+            options={"target": 800, "unit": "cal", "icon": "fire"},
         )
     )
 
@@ -267,14 +267,14 @@ def generate_multi_progress(renderer: Renderer, output_dir: Path) -> None:
                         "label": "Move",
                         "target": 800,
                         "color": COLOR_RED,
-                        "icon": "flame",
+                        "icon": "fire",
                     },
                     {
                         "entity_id": "sensor.exercise",
                         "label": "Exercise",
                         "target": 40,
                         "color": COLOR_LIME,
-                        "icon": "steps",
+                        "icon": "walk",
                     },
                     {
                         "entity_id": "sensor.stand",
@@ -388,7 +388,7 @@ def generate_gauge_bar(renderer: Renderer, output_dir: Path) -> None:
             entity_id="sensor.cpu",
             label="CPU",
             color=COLOR_TEAL,
-            options={"style": "bar", "max": 100, "icon": "cpu"},
+            options={"style": "bar", "max": 100, "icon": "chip"},
         )
     )
 

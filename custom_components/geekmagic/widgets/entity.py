@@ -18,6 +18,7 @@ from .components import Component, Panel
 from .helpers import (
     estimate_max_chars,
     format_value_with_unit,
+    get_entity_icon,
     get_unit,
     resolve_label,
     truncate_text,
@@ -37,7 +38,8 @@ class EntityWidget(Widget):
         super().__init__(config)
         self.show_name = config.options.get("show_name", True)
         self.show_unit = config.options.get("show_unit", True)
-        self.icon = config.options.get("icon")
+        self.show_icon = config.options.get("show_icon", True)
+        self.icon = config.options.get("icon")  # Explicit icon override
         self.show_panel = config.options.get("show_panel", False)
 
     def render(
@@ -77,10 +79,16 @@ class EntityWidget(Widget):
         value_text = format_value_with_unit(value, unit)
         label = name if self.show_name else None
 
+        # Determine icon to use (priority: explicit config > entity icon > none)
+        icon = self.icon
+        if not icon and self.show_icon:
+            # Try to get icon from HA entity (e.g., "mdi:thermometer")
+            icon = get_entity_icon(state)
+
         # Build component based on whether we have an icon
-        if self.icon:
+        if icon:
             content = IconValue(
-                icon=self.icon,
+                icon=icon,
                 value=value_text,
                 label=label or "",
                 color=color,

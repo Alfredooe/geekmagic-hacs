@@ -82,7 +82,7 @@ def render_system_monitor(renderer: Renderer) -> bytes:
     )
 
     # Disk bar
-    renderer.draw_icon(draw, "disk", (12, 135), size=14, color=COLOR_ORANGE)
+    renderer.draw_icon(draw, "harddisk", (12, 135), size=14, color=COLOR_ORANGE)
     renderer.draw_text(
         draw, "DISK", (32, 142), font=renderer.font_tiny, color=COLOR_GRAY, anchor="lm"
     )
@@ -143,7 +143,7 @@ def render_clock(renderer: Renderer) -> bytes:
 
     # Weather placeholder
     renderer.draw_panel(draw, (8, 135, 232, 195), COLOR_PANEL, radius=4)
-    renderer.draw_icon(draw, "sun", (20, 150), size=24, color=COLOR_YELLOW)
+    renderer.draw_icon(draw, "weather-sunny", (20, 150), size=24, color=COLOR_YELLOW)
     renderer.draw_text(
         draw, "21°C", (55, 155), font=renderer.font_large, color=COLOR_WHITE, anchor="lm"
     )
@@ -354,7 +354,7 @@ def render_energy(renderer: Renderer) -> bytes:
     usage_data = [random.uniform(0.5, 4.0) for _ in range(30)]
 
     # Header
-    renderer.draw_icon(draw, "bolt", (10, 8), size=16, color=COLOR_YELLOW)
+    renderer.draw_icon(draw, "lightning-bolt", (10, 8), size=16, color=COLOR_YELLOW)
     renderer.draw_text(
         draw, "ENERGY", (32, 16), font=renderer.font_small, color=COLOR_WHITE, anchor="lm"
     )
@@ -376,7 +376,7 @@ def render_energy(renderer: Renderer) -> bytes:
     )
 
     # Solar
-    renderer.draw_icon(draw, "sun", (130, 40), size=14, color=COLOR_YELLOW)
+    renderer.draw_icon(draw, "weather-sunny", (130, 40), size=14, color=COLOR_YELLOW)
     renderer.draw_text(
         draw, "SOLAR", (150, 47), font=renderer.font_tiny, color=COLOR_GRAY, anchor="lm"
     )

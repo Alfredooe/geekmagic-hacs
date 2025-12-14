@@ -138,6 +138,27 @@ def get_unit(state: State | None, default: str = "") -> str:
     return state.attributes.get("unit_of_measurement", default)
 
 
+def get_entity_icon(state: State | None) -> str | None:
+    """Get the icon configured for an HA entity.
+
+    Home Assistant entities can have icons set via:
+    - User customization in the UI
+    - Integration defaults based on device class
+    - Domain defaults
+
+    The icon is in MDI format, e.g., "mdi:thermometer".
+
+    Args:
+        state: Entity state object
+
+    Returns:
+        Icon string in MDI format (e.g., "mdi:thermometer") or None if not set
+    """
+    if state is None:
+        return None
+    return state.attributes.get("icon")
+
+
 def estimate_max_chars(
     available_width: int,
     char_width: int = 8,
