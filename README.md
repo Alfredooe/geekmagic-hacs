@@ -132,17 +132,37 @@ Choose from **10 built-in themes** that go beyond just colors - affecting typogr
 
 ### Using the GeekMagic Panel
 
-After installation, a **GeekMagic** item appears in your sidebar. Use this panel to:
+After installation, a **GeekMagic** item appears in your sidebar.
 
-1. **Views tab**: Create and edit display views with live preview
-   - Choose layout (2x2, 2x3, hero, etc.)
-   - Select theme (10 options)
-   - Configure widgets with entity pickers
-   - See real-time preview as you edit
+<!-- TODO: Add screenshot of panel here -->
 
-2. **Devices tab**: Assign views to your devices
-   - Check which views each device should display
-   - Devices cycle through assigned views automatically
+#### Views Tab
+
+Create and manage display views:
+
+- **Create views** with the "+ Add View" button
+- **Edit views** by clicking on them
+- **Delete views** via the menu on each card
+
+#### View Editor
+
+The editor provides a live preview and widget configuration:
+
+<!-- TODO: Add screenshot of editor here -->
+
+- **Preview**: See real-time rendering as you configure
+- **Layout**: Choose grid size (2x2, 2x3, 3x2, hero, split, etc.)
+- **Theme**: Select from 10 visual themes
+- **Widgets**: Each slot shows a position grid - click cells to swap widget positions
+- **Entity picker**: Native Home Assistant entity selector with filtering
+
+#### Devices Tab
+
+Assign views to your GeekMagic devices:
+
+- Check which views each device should display
+- Devices automatically cycle through assigned views
+- Drag to reorder the rotation sequence
 
 ---
 
