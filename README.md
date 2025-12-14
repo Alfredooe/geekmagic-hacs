@@ -78,8 +78,9 @@ Choose from **10 built-in themes** that go beyond just colors - affecting typogr
 - **12 widget types**: Clock, entity, media, chart, text, gauge, progress, weather, status, camera, and more
 - **6 layout options**: Grid (2x2, 2x3, 3x2), hero, split, three-column
 - **10 visual themes**: Classic, Minimal, Neon, Retro, Soft, Light, Ocean, Sunset, Forest, Candy
-- **Entity-based configuration**: Configure via Home Assistant entities (WLED-style)
-- **Multi-screen support**: Up to 10 screens with auto-cycling
+- **Visual configuration**: Custom sidebar panel with live preview
+- **Global views**: Create views once, assign to multiple devices
+- **Multi-screen support**: Assign multiple views per device with auto-cycling
 - **Pure Python rendering**: Uses Pillow for image generation (no browser required)
 - **Configurable refresh**: Updates every 5-300 seconds
 
@@ -100,16 +101,26 @@ Choose from **10 built-in themes** that go beyond just colors - affecting typogr
 
 ## Configuration
 
+### Adding a Device
+
 1. Go to **Settings** → **Devices & Services**
 2. Click **Add Integration**
 3. Search for "GeekMagic"
 4. Enter your device's IP address
 
-After adding the integration, your device will display a welcome screen until you configure a dashboard:
+### Using the GeekMagic Panel
 
-<p align="center">
-  <img src="samples/00_welcome_screen.png" alt="Welcome Screen" width="180">
-</p>
+After installation, a **GeekMagic** item appears in your sidebar. Use this panel to:
+
+1. **Views tab**: Create and edit display views with live preview
+   - Choose layout (2x2, 2x3, hero, etc.)
+   - Select theme (10 options)
+   - Configure widgets with entity pickers
+   - See real-time preview as you edit
+
+2. **Devices tab**: Assign views to your devices
+   - Check which views each device should display
+   - Devices cycle through assigned views automatically
 
 ---
 
@@ -139,35 +150,6 @@ After adding the integration, your device will display a welcome screen until yo
 | `hero` | 4 | Large hero + 3 footer widgets |
 | `split` | 2 | Left/right or top/bottom panels |
 | `three_column` | 3 | 3 vertical columns |
-
----
-
-## Entity-Based Configuration
-
-GeekMagic uses **entity-based configuration** similar to WLED. Configure your display directly through Home Assistant entities on the device page.
-
-### Device Entities
-
-| Entity | Type | Description |
-|--------|------|-------------|
-| `number.xxx_brightness` | Number | Display brightness (0-100) |
-| `number.xxx_refresh_interval` | Number | Update interval in seconds (5-300) |
-| `number.xxx_screen_count` | Number | Number of screens (1-10) |
-| `select.xxx_current_screen` | Select | Active screen selector |
-| `button.xxx_refresh_now` | Button | Force immediate display update |
-| `button.xxx_next_screen` | Button | Switch to next screen |
-| `sensor.xxx_status` | Sensor | Connection status |
-
-### Per-Screen Entities
-
-| Entity | Description |
-|--------|-------------|
-| `text.xxx_screen_N_name` | Screen name |
-| `select.xxx_screen_N_layout` | Layout type |
-| `select.xxx_screen_N_theme` | Visual theme (10 options) |
-| `select.xxx_screen_N_slot_M_widget` | Widget type for slot M |
-| `text.xxx_screen_N_slot_M_entity` | Entity ID for slot M |
-| `text.xxx_screen_N_slot_M_label` | Custom label for slot M |
 
 ---
 
