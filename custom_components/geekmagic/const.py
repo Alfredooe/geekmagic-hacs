@@ -32,6 +32,11 @@ THEME_MINIMAL = "minimal"
 THEME_NEON = "neon"
 THEME_RETRO = "retro"
 THEME_SOFT = "soft"
+THEME_LIGHT = "light"
+THEME_OCEAN = "ocean"
+THEME_SUNSET = "sunset"
+THEME_FOREST = "forest"
+THEME_CANDY = "candy"
 
 # Theme display names for UI
 THEME_OPTIONS = {
@@ -40,6 +45,11 @@ THEME_OPTIONS = {
     THEME_NEON: "Neon",
     THEME_RETRO: "Retro",
     THEME_SOFT: "Soft",
+    THEME_LIGHT: "Light",
+    THEME_OCEAN: "Ocean",
+    THEME_SUNSET: "Sunset",
+    THEME_FOREST: "Forest",
+    THEME_CANDY: "Candy",
 }
 
 # Layout types

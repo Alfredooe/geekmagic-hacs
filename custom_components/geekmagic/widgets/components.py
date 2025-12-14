@@ -273,9 +273,9 @@ class Panel(Component):
     """
 
     child: Component | None = None
-    color: Color | None = None  # None = use theme.panel_fill
+    color: Color | None = None  # None = use theme.surface
     radius: int | None = None  # None = use theme.corner_radius
-    border_color: Color | None = None  # None = use theme.panel_border if border_width > 0
+    border_color: Color | None = None  # None = use theme.border if border_width > 0
 
     def measure(self, ctx: RenderContext, max_width: int, max_height: int) -> tuple[int, int]:
         if self.child:
@@ -285,12 +285,12 @@ class Panel(Component):
     def render(self, ctx: RenderContext, x: int, y: int, width: int, height: int) -> None:
         theme = ctx.theme
         # Use theme defaults when not explicitly specified
-        fill_color = self.color if self.color is not None else theme.panel_fill
+        fill_color = self.color if self.color is not None else theme.surface
         corner_radius = self.radius if self.radius is not None else theme.corner_radius
 
         # Draw panel with optional border based on theme
         if theme.border_width > 0:
-            border = self.border_color if self.border_color is not None else theme.panel_border
+            border = self.border_color if self.border_color is not None else theme.border
             ctx.draw_panel(
                 (x, y, x + width, y + height),
                 fill_color,
