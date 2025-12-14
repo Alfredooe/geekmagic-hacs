@@ -360,6 +360,34 @@ class RenderContext:
             self._draw, abs_rect, data, color=color, fill=fill, smooth=smooth
         )
 
+    def draw_timeline_bar(
+        self,
+        rect: tuple[int, int, int, int],
+        data: list[float],
+        on_color: tuple[int, int, int],
+        off_color: tuple[int, int, int] | None = None,
+    ) -> None:
+        """Draw a timeline bar showing state changes over time.
+
+        Used for binary sensors where data is 0.0 (off) or 1.0 (on).
+
+        Args:
+            rect: (x1, y1, x2, y2) in local coordinates
+            data: List of data points (0.0 for off, 1.0 for on)
+            on_color: Color for "on" state (1.0)
+            off_color: Color for "off" state (0.0), defaults to gray
+        """
+        from .const import COLOR_GRAY
+
+        abs_rect = self._abs_rect(rect)
+        self._renderer.draw_timeline_bar(
+            self._draw,
+            abs_rect,
+            data,
+            on_color=on_color,
+            off_color=off_color or COLOR_GRAY,
+        )
+
     def draw_ellipse(
         self,
         rect: tuple[int, int, int, int],

@@ -235,6 +235,22 @@ def generate_widget_sizes(renderer: Renderer, output_dir: Path) -> None:
         widget.set_history([20, 21, 22, 21, 23, 24, 23, 22, 21, 22, 23, 24])
         return widget
 
+    def make_chart_binary(slot: int) -> ChartWidget:
+        widget = ChartWidget(
+            WidgetConfig(
+                widget_type="chart",
+                slot=slot,
+                entity_id="binary_sensor.door",
+                label="Door",
+                color=COLOR_LIME,
+                options={},
+            )
+        )
+        # Set mock binary history data (0=off/closed, 1=on/open)
+        # Simulates door opening and closing over time
+        widget.set_history([0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0])
+        return widget
+
     # Widget configs: (name, factory)
     widget_types = [
         ("gauge_bar", make_gauge_bar),
@@ -248,6 +264,7 @@ def generate_widget_sizes(renderer: Renderer, output_dir: Path) -> None:
         ("weather", make_weather),
         ("status", make_status),
         ("chart", make_chart),
+        ("chart_binary", make_chart_binary),
     ]
 
     # Layout configs: (suffix, layout_class, num_slots, padding, gap)
@@ -1108,6 +1125,85 @@ def generate_welcome_screen(renderer: Renderer, output_dir: Path) -> None:
     save_image(renderer, img, "00_welcome_screen", output_dir)
 
 
+def generate_charts_dashboard(renderer: Renderer, output_dir: Path) -> None:
+    """Generate charts dashboard showing numeric and binary sensor history."""
+    from custom_components.geekmagic.widgets.chart import ChartWidget
+
+    hass = MockHass()
+    hass.states.set(
+        "sensor.temperature", "23.5", {"unit_of_measurement": "°C", "friendly_name": "Temperature"}
+    )
+    hass.states.set(
+        "sensor.humidity", "65", {"unit_of_measurement": "%", "friendly_name": "Humidity"}
+    )
+    hass.states.set("binary_sensor.motion", "off", {"friendly_name": "Motion"})
+    hass.states.set("binary_sensor.door", "off", {"friendly_name": "Door"})
+
+    layout = Grid2x2(padding=8, gap=8)
+    img, draw = renderer.create_canvas()
+
+    # Temperature chart (numeric)
+    temp_chart = ChartWidget(
+        WidgetConfig(
+            widget_type="chart",
+            slot=0,
+            entity_id="sensor.temperature",
+            label="Temperature",
+            color=COLOR_ORANGE,
+            options={},
+        )
+    )
+    temp_chart.set_history([21.5, 22.0, 22.5, 23.0, 23.5, 24.0, 23.8, 23.5, 23.0, 22.5, 23.0, 23.5])
+    layout.set_widget(0, temp_chart)
+
+    # Humidity chart (numeric)
+    humid_chart = ChartWidget(
+        WidgetConfig(
+            widget_type="chart",
+            slot=1,
+            entity_id="sensor.humidity",
+            label="Humidity",
+            color=COLOR_CYAN,
+            options={},
+        )
+    )
+    humid_chart.set_history([60, 62, 65, 68, 70, 68, 65, 63, 60, 58, 60, 65])
+    layout.set_widget(1, humid_chart)
+
+    # Motion sensor chart (binary)
+    motion_chart = ChartWidget(
+        WidgetConfig(
+            widget_type="chart",
+            slot=2,
+            entity_id="binary_sensor.motion",
+            label="Motion",
+            color=COLOR_RED,
+            options={},
+        )
+    )
+    # Binary: 0=no motion, 1=motion detected
+    motion_chart.set_history([0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0])
+    layout.set_widget(2, motion_chart)
+
+    # Door sensor chart (binary)
+    door_chart = ChartWidget(
+        WidgetConfig(
+            widget_type="chart",
+            slot=3,
+            entity_id="binary_sensor.door",
+            label="Door",
+            color=COLOR_LIME,
+            options={},
+        )
+    )
+    # Binary: 0=closed, 1=open
+    door_chart.set_history([0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0])
+    layout.set_widget(3, door_chart)
+
+    layout.render(renderer, draw, hass)  # type: ignore[arg-type]
+    save_image(renderer, img, "15_charts_dashboard", output_dir)
+
+
 def generate_gauge_sizes_2x2(renderer: Renderer, output_dir: Path) -> None:
     """Generate gauges in 2x2 layout (large cells) to show responsive behavior."""
     hass = MockHass()
@@ -1207,6 +1303,7 @@ def main() -> None:
     generate_security(renderer, output_dir)
     generate_gauge_sizes_2x2(renderer, output_dir)
     generate_gauge_sizes_2x3(renderer, output_dir)
+    generate_charts_dashboard(renderer, output_dir)
     generate_widget_sizes(renderer, output_dir)
 
     print()

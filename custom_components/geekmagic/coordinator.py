@@ -86,6 +86,53 @@ WIDGET_CLASSES = {
 }
 
 
+# Binary states that should be converted to 1.0 (on/true)
+BINARY_ON_STATES = frozenset({"on", "true", "open", "home", "unlocked", "playing", "active"})
+# Binary states that should be converted to 0.0 (off/false)
+BINARY_OFF_STATES = frozenset(
+    {"off", "false", "closed", "not_home", "locked", "paused", "idle", "standby"}
+)
+
+
+def extract_numeric_values(history_states: list) -> list[float]:
+    """Extract numeric values from recorder history states.
+
+    Handles both State objects (with .state attribute) and
+    dictionaries (from minimal_response=True format).
+
+    Also converts binary states (on/off, open/closed, etc.) to 1.0/0.0
+    for charting binary_sensor entities.
+
+    Args:
+        history_states: List of State objects or dicts from recorder
+
+    Returns:
+        List of numeric float values, non-numeric states are skipped
+    """
+    values: list[float] = []
+    for state in history_states:
+        try:
+            # Handle both State objects and minimal_response dicts
+            state_value = state.state if hasattr(state, "state") else state.get("state")
+            if state_value is None:
+                continue
+
+            # Try numeric conversion first
+            try:
+                values.append(float(state_value))
+            except (ValueError, TypeError):
+                # Check for binary states
+                state_lower = str(state_value).lower()
+                if state_lower in BINARY_ON_STATES:
+                    values.append(1.0)
+                elif state_lower in BINARY_OFF_STATES:
+                    values.append(0.0)
+                # Skip other non-numeric states (unavailable, unknown, etc.)
+        except AttributeError:
+            continue
+    return values
+
+
 class GeekMagicCoordinator(DataUpdateCoordinator):
     """Coordinator for GeekMagic display updates."""
 
@@ -765,12 +812,8 @@ class GeekMagicCoordinator(DataUpdateCoordinator):
 
                 if history and entity_id in history:
                     # Extract numeric values from states
-                    values: list[float] = []
-                    for state in history[entity_id]:
-                        try:
-                            values.append(float(state.state))
-                        except (ValueError, TypeError):
-                            continue
+                    # (handles both State objects and minimal_response dicts)
+                    values = extract_numeric_values(history[entity_id])
 
                     if values:
                         widget.set_history(values)

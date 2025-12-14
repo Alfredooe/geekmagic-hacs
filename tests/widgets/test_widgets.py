@@ -341,6 +341,48 @@ class TestChartWidget:
         widget.render(ctx, hass=hass)
         assert img.size == (480, 480)
 
+    def test_is_binary_data_true(self):
+        """Test binary data detection returns true for 0/1 data."""
+        config = WidgetConfig(widget_type="chart", slot=0)
+        widget = ChartWidget(config)
+        widget.set_history([0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0])
+        assert widget._is_binary_data() is True
+
+    def test_is_binary_data_false(self):
+        """Test binary data detection returns false for numeric data."""
+        config = WidgetConfig(widget_type="chart", slot=0)
+        widget = ChartWidget(config)
+        widget.set_history([20.0, 21.5, 22.0, 21.0, 23.5])
+        assert widget._is_binary_data() is False
+
+    def test_is_binary_data_empty(self):
+        """Test binary data detection returns false for empty data."""
+        config = WidgetConfig(widget_type="chart", slot=0)
+        widget = ChartWidget(config)
+        assert widget._is_binary_data() is False
+
+    def test_render_binary_data(self, renderer, canvas, rect, hass):
+        """Test rendering with binary sensor data uses timeline bar."""
+        img, draw = canvas
+        ctx = RenderContext(draw, rect, renderer)
+        hass.states.async_set(
+            "binary_sensor.door",
+            "off",
+            {"friendly_name": "Door"},
+        )
+
+        config = WidgetConfig(
+            widget_type="chart",
+            slot=0,
+            entity_id="binary_sensor.door",
+            label="Door",
+        )
+        widget = ChartWidget(config)
+        # Binary data: 0=closed, 1=open
+        widget.set_history([0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0])
+        widget.render(ctx, hass=hass)
+        assert img.size == (480, 480)
+
 
 class TestTextWidget:
     """Tests for TextWidget."""

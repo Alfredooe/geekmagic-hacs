@@ -494,6 +494,51 @@ class Renderer:
         if len(int_points) >= 2:
             draw.line(int_points, fill=color, width=self._s(2))
 
+    def draw_timeline_bar(
+        self,
+        draw: ImageDraw.ImageDraw,
+        rect: tuple[int, int, int, int],
+        data: list[float],
+        on_color: tuple[int, int, int] = COLOR_CYAN,
+        off_color: tuple[int, int, int] = COLOR_GRAY,
+    ) -> None:
+        """Draw a timeline bar showing state changes over time.
+
+        Used for binary sensors where data is 0.0 (off) or 1.0 (on).
+        Each segment is colored based on the state at that time.
+
+        Args:
+            draw: ImageDraw instance
+            rect: (x1, y1, x2, y2) bounding box
+            data: List of data points (0.0 for off, 1.0 for on)
+            on_color: Color for "on" state (1.0)
+            off_color: Color for "off" state (0.0)
+        """
+        if not data:
+            return
+
+        x1, y1, x2, y2 = rect
+        # Scale coordinates
+        x1, y1, x2, y2 = self._s(x1), self._s(y1), self._s(x2), self._s(y2)
+        width = x2 - x1
+
+        # Calculate segment width (each data point gets equal width)
+        segment_width = width / len(data)
+
+        # Draw each segment
+        for i, value in enumerate(data):
+            seg_x1 = x1 + i * segment_width
+            seg_x2 = x1 + (i + 1) * segment_width
+
+            # Choose color based on value (1.0 = on, 0.0 = off)
+            color = on_color if value >= 0.5 else off_color
+
+            # Draw the segment as a filled rectangle
+            draw.rectangle(
+                [int(seg_x1), y1, int(seg_x2), y2],
+                fill=color,
+            )
+
     def draw_arc(
         self,
         draw: ImageDraw.ImageDraw,

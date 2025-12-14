@@ -15,7 +15,11 @@ if TYPE_CHECKING:
 
 
 class ChartWidget(Widget):
-    """Widget that displays a sparkline chart from entity history."""
+    """Widget that displays a sparkline chart or timeline bar from entity history.
+
+    Automatically detects binary data (all 0.0/1.0 values) and displays
+    as a timeline bar instead of a sparkline chart.
+    """
 
     def __init__(self, config: WidgetConfig) -> None:
         """Initialize the chart widget."""
@@ -34,6 +38,16 @@ class ChartWidget(Widget):
             data: List of numeric values
         """
         self._history_data = data
+
+    def _is_binary_data(self) -> bool:
+        """Check if history data is binary (all values are 0.0 or 1.0).
+
+        Returns:
+            True if data appears to be from a binary sensor
+        """
+        if not self._history_data:
+            return False
+        return all(v in {0.0, 1.0} for v in self._history_data)
 
     def render(
         self,
@@ -102,31 +116,39 @@ class ChartWidget(Widget):
                 anchor="rm",
             )
 
-        # Draw sparkline
+        # Draw chart
         if self._history_data and len(self._history_data) >= 2:
             color = self.config.color or COLOR_CYAN
-            ctx.draw_sparkline(chart_rect, self._history_data, color=color, fill=True)
+            is_binary = self._is_binary_data()
 
-            # Draw min/max range
-            if self.show_range:
-                min_val = min(self._history_data)
-                max_val = max(self._history_data)
-                range_y = chart_bottom + int(ctx.height * 0.08)
+            if is_binary:
+                # Binary data: use timeline bar visualization
+                ctx.draw_timeline_bar(chart_rect, self._history_data, on_color=color)
+                # No range footer for binary (would just be 0/1)
+            else:
+                # Numeric data: use sparkline chart
+                ctx.draw_sparkline(chart_rect, self._history_data, color=color, fill=True)
 
-                ctx.draw_text(
-                    f"{min_val:.1f}",
-                    (padding, range_y),
-                    font=font_label,
-                    color=COLOR_GRAY,
-                    anchor="lm",
-                )
-                ctx.draw_text(
-                    f"{max_val:.1f}",
-                    (ctx.width - padding, range_y),
-                    font=font_label,
-                    color=COLOR_GRAY,
-                    anchor="rm",
-                )
+                # Draw min/max range for numeric data
+                if self.show_range:
+                    min_val = min(self._history_data)
+                    max_val = max(self._history_data)
+                    range_y = chart_bottom + int(ctx.height * 0.08)
+
+                    ctx.draw_text(
+                        f"{min_val:.1f}",
+                        (padding, range_y),
+                        font=font_label,
+                        color=COLOR_GRAY,
+                        anchor="lm",
+                    )
+                    ctx.draw_text(
+                        f"{max_val:.1f}",
+                        (ctx.width - padding, range_y),
+                        font=font_label,
+                        color=COLOR_GRAY,
+                        anchor="rm",
+                    )
         else:
             # No data - show placeholder
             center_x = ctx.width // 2
