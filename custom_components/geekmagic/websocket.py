@@ -64,7 +64,7 @@ WIDGET_TYPE_SCHEMAS: dict[str, dict[str, Any]] = {
     "gauge": {
         "name": "Gauge",
         "needs_entity": True,
-        "entity_domains": ["sensor", "number", "input_number"],
+        "entity_domains": None,  # Any entity with numeric state
         "options": [
             {
                 "key": "style",
@@ -81,7 +81,7 @@ WIDGET_TYPE_SCHEMAS: dict[str, dict[str, Any]] = {
     "chart": {
         "name": "Chart",
         "needs_entity": True,
-        "entity_domains": ["sensor"],
+        "entity_domains": None,  # Any entity with numeric state
         "options": [
             {
                 "key": "hours",
@@ -129,7 +129,7 @@ WIDGET_TYPE_SCHEMAS: dict[str, dict[str, Any]] = {
     "progress": {
         "name": "Progress",
         "needs_entity": True,
-        "entity_domains": ["sensor", "number", "input_number"],
+        "entity_domains": None,  # Any entity with numeric state
         "options": [
             {"key": "goal", "type": "number", "label": "Goal Value"},
             {"key": "unit", "type": "text", "label": "Unit"},
@@ -155,7 +155,7 @@ WIDGET_TYPE_SCHEMAS: dict[str, dict[str, Any]] = {
     "status": {
         "name": "Status",
         "needs_entity": True,
-        "entity_domains": ["binary_sensor", "switch", "light", "lock", "input_boolean"],
+        "entity_domains": None,  # Any entity (interprets state as on/off)
         "options": [
             {"key": "on_text", "type": "text", "label": "On Text", "default": "On"},
             {"key": "off_text", "type": "text", "label": "Off Text", "default": "Off"},

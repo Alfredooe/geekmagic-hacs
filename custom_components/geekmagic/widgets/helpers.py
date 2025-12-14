@@ -139,24 +139,148 @@ def get_unit(state: State | None, default: str = "") -> str:
 
 
 def get_entity_icon(state: State | None) -> str | None:
-    """Get the icon configured for an HA entity.
+    """Get the icon for an HA entity.
 
-    Home Assistant entities can have icons set via:
-    - User customization in the UI
-    - Integration defaults based on device class
-    - Domain defaults
-
-    The icon is in MDI format, e.g., "mdi:thermometer".
+    Checks multiple sources:
+    1. Explicit icon attribute (user customization or integration)
+    2. Device class default icon
+    3. Domain default icon
 
     Args:
         state: Entity state object
 
     Returns:
-        Icon string in MDI format (e.g., "mdi:thermometer") or None if not set
+        Icon string in MDI format (e.g., "mdi:thermometer") or None if not found
     """
     if state is None:
         return None
-    return state.attributes.get("icon")
+
+    # Check explicit icon attribute first
+    icon = state.attributes.get("icon")
+    if icon:
+        return icon
+
+    # Get domain from entity_id
+    entity_id = state.entity_id
+    domain = entity_id.split(".")[0] if "." in entity_id else None
+
+    # Check device class for domain-specific icons
+    device_class = state.attributes.get("device_class")
+    if device_class:
+        device_class_icon = _get_device_class_icon(domain, device_class)
+        if device_class_icon:
+            return device_class_icon
+
+    # Fall back to domain default
+    if domain:
+        return _get_domain_icon(domain)
+
+    return None
+
+
+def _get_device_class_icon(domain: str | None, device_class: str) -> str | None:
+    """Get icon for a device class."""
+    # Common device class icons
+    device_class_icons = {
+        # Sensors
+        "temperature": "mdi:thermometer",
+        "humidity": "mdi:water-percent",
+        "pressure": "mdi:gauge",
+        "battery": "mdi:battery",
+        "power": "mdi:flash",
+        "energy": "mdi:lightning-bolt",
+        "voltage": "mdi:sine-wave",
+        "current": "mdi:current-ac",
+        "frequency": "mdi:sine-wave",
+        "illuminance": "mdi:brightness-5",
+        "signal_strength": "mdi:wifi",
+        "carbon_dioxide": "mdi:molecule-co2",
+        "carbon_monoxide": "mdi:molecule-co",
+        "pm25": "mdi:blur",
+        "pm10": "mdi:blur",
+        "volatile_organic_compounds": "mdi:air-filter",
+        "nitrogen_dioxide": "mdi:molecule",
+        "ozone": "mdi:molecule",
+        "sulphur_dioxide": "mdi:molecule",
+        "timestamp": "mdi:clock",
+        "duration": "mdi:timer",
+        "moisture": "mdi:water",
+        "gas": "mdi:gas-cylinder",
+        "speed": "mdi:speedometer",
+        "wind_speed": "mdi:weather-windy",
+        "weight": "mdi:weight",
+        "distance": "mdi:ruler",
+        "monetary": "mdi:currency-usd",
+        "data_rate": "mdi:download",
+        "data_size": "mdi:database",
+        # Binary sensors
+        "motion": "mdi:motion-sensor",
+        "door": "mdi:door",
+        "window": "mdi:window-closed",
+        "opening": "mdi:door-open",
+        "presence": "mdi:home-account",
+        "occupancy": "mdi:home-account",
+        "smoke": "mdi:smoke-detector",
+        "lock": "mdi:lock",
+        "plug": "mdi:power-plug",
+        "connectivity": "mdi:connection",
+        "problem": "mdi:alert-circle",
+        "safety": "mdi:shield-check",
+        "sound": "mdi:microphone",
+        "vibration": "mdi:vibrate",
+        "running": "mdi:play-circle",
+        "update": "mdi:package-up",
+    }
+    return (
+        f"mdi:{device_class_icons.get(device_class, '').replace('mdi:', '')}"
+        if device_class in device_class_icons
+        else None
+    )
+
+
+def _get_domain_icon(domain: str) -> str | None:
+    """Get default icon for a domain."""
+    domain_icons = {
+        "sensor": "mdi:eye",
+        "binary_sensor": "mdi:checkbox-blank-circle",
+        "switch": "mdi:toggle-switch",
+        "light": "mdi:lightbulb",
+        "fan": "mdi:fan",
+        "climate": "mdi:thermostat",
+        "lock": "mdi:lock",
+        "cover": "mdi:window-shutter",
+        "camera": "mdi:camera",
+        "media_player": "mdi:cast",
+        "vacuum": "mdi:robot-vacuum",
+        "weather": "mdi:weather-partly-cloudy",
+        "person": "mdi:account",
+        "device_tracker": "mdi:crosshairs-gps",
+        "automation": "mdi:robot",
+        "script": "mdi:script-text",
+        "scene": "mdi:palette",
+        "input_boolean": "mdi:toggle-switch",
+        "input_number": "mdi:ray-vertex",
+        "input_select": "mdi:format-list-bulleted",
+        "input_text": "mdi:form-textbox",
+        "input_datetime": "mdi:calendar-clock",
+        "input_button": "mdi:gesture-tap-button",
+        "counter": "mdi:counter",
+        "timer": "mdi:timer",
+        "calendar": "mdi:calendar",
+        "alarm_control_panel": "mdi:shield-home",
+        "number": "mdi:ray-vertex",
+        "select": "mdi:format-list-bulleted",
+        "button": "mdi:gesture-tap-button",
+        "text": "mdi:form-textbox",
+        "update": "mdi:package-up",
+        "water_heater": "mdi:water-boiler",
+        "humidifier": "mdi:air-humidifier",
+        "remote": "mdi:remote",
+        "siren": "mdi:bullhorn",
+        "lawn_mower": "mdi:robot-mower",
+        "valve": "mdi:valve",
+    }
+    return domain_icons.get(domain)
 
 
 def estimate_max_chars(
