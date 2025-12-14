@@ -2,7 +2,29 @@
 
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 
-A Home Assistant custom integration for GeekMagic displays (SmallTV Pro and similar ESP8266-based devices).
+A Home Assistant custom integration for GeekMagic displays (SmallTV Pro, Ultra, and similar ESP8266-based devices).
+
+> **How it works:** This integration renders dashboard images directly in Home Assistant using Python/Pillow and pushes them to your GeekMagic device over HTTP. No flashing required - works with stock firmware.
+
+---
+
+### Disclaimers
+
+> **Early Software:** This project is in active development. Expect bugs, breaking changes, and incomplete features. The API and configuration format may change between versions.
+
+> **Vibe Coded:** This integration was largely vibe-coded with AI assistance. While functional, it may contain unconventional patterns or rough edges. Contributions and feedback welcome!
+
+---
+
+### Background & Credits
+
+I have a **GeekMagic Ultra** with ESP8266, which has [limited possibilities for flashing with ESPHome](https://community.home-assistant.io/t/installing-esphome-on-geekmagic-smart-weather-clock-smalltv-pro/618029). Instead of fighting the hardware, this integration takes a different approach: render everything server-side and push images to the device.
+
+Special thanks to:
+- The [Home Assistant Community thread](https://community.home-assistant.io/t/installing-esphome-on-geekmagic-smart-weather-clock-smalltv-pro/618029) for documenting GeekMagic device capabilities
+- **[Aydar (@aydarik)](https://community.home-assistant.io/t/installing-esphome-on-geekmagic-smart-weather-clock-smalltv-pro/618029/214)** for sharing the [bash script](https://gist.github.com/aydarik/e81edaf63041a85fb0325a1c8c2e4bac) that demonstrated how to push images to these devices - the core inspiration for this integration
+
+---
 
 ## Dashboard Samples
 
