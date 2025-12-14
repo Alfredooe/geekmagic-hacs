@@ -34,7 +34,7 @@ from .const import (
     LAYOUT_THREE_COLUMN,
     THEME_CLASSIC,
 )
-from .device import GeekMagicDevice
+from .device import DeviceState, GeekMagicDevice, SpaceInfo
 from .layouts.grid import Grid2x2, Grid2x3, Grid3x2
 from .layouts.hero import HeroLayout
 from .layouts.split import SplitLayout, ThreeColumnLayout
@@ -117,6 +117,10 @@ class GeekMagicCoordinator(DataUpdateCoordinator):
         self._camera_images: dict[str, bytes] = {}  # Pre-fetched camera images
         self._update_preview: bool = True  # Update preview on next refresh
         self._preview_just_updated: bool = False  # True if preview was updated in last refresh
+
+        # Device state (updated on refresh)
+        self._device_state: DeviceState | None = None
+        self._space_info: SpaceInfo | None = None
 
         # Get refresh interval from options
         interval = self.options.get(CONF_REFRESH_INTERVAL, DEFAULT_REFRESH_INTERVAL)
@@ -515,6 +519,13 @@ class GeekMagicCoordinator(DataUpdateCoordinator):
                         self._current_screen,
                     )
 
+            # Fetch device state and storage info
+            try:
+                self._device_state = await self.device.get_state()
+                self._space_info = await self.device.get_space()
+            except Exception as e:
+                _LOGGER.debug("Failed to fetch device state: %s", e)
+
             # Pre-fetch camera images and chart history (must be done in async context)
             await self._async_fetch_camera_images()
             await self._async_fetch_chart_history()
@@ -602,6 +613,29 @@ class GeekMagicCoordinator(DataUpdateCoordinator):
     def brightness(self) -> int:
         """Get current brightness setting."""
         return self.options.get("brightness", 50)
+
+    @property
+    def entry(self):
+        """Get config entry (alias for config_entry)."""
+        return self.config_entry
+
+    @property
+    def device_state(self) -> DeviceState | None:
+        """Get current device state."""
+        return self._device_state
+
+    @property
+    def space_info(self) -> SpaceInfo | None:
+        """Get device storage info."""
+        return self._space_info
+
+    def get_store(self) -> GeekMagicStore | None:
+        """Get global views store."""
+        return self._get_store()
+
+    def set_current_screen(self, index: int) -> None:
+        """Set current screen index."""
+        self._current_screen = index
 
     async def async_set_brightness(self, brightness: int) -> None:
         """Set display brightness.

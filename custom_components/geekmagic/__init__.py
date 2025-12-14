@@ -18,9 +18,13 @@ from .websocket import async_register_websocket_commands
 
 _LOGGER = logging.getLogger(__name__)
 
-# Only keep IMAGE platform - entity-based config is replaced by custom panel
+# Platforms for device control entities and image output
 PLATFORMS: list[Platform] = [
     Platform.IMAGE,
+    Platform.NUMBER,
+    Platform.SELECT,
+    Platform.SENSOR,
+    Platform.BUTTON,
 ]
 
 
