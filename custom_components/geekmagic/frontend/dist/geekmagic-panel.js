@@ -285,7 +285,7 @@ E.elementStyles = [], E.shadowRootOptions = { mode: "open" }, E[C("elementProper
  * SPDX-License-Identifier: BSD-3-Clause
  */
 const V = globalThis, j = V.trustedTypes, ee = j ? j.createPolicy("lit-html", { createHTML: (s) => s }) : void 0, le = "$lit$", $ = `lit$${Math.random().toFixed(9).slice(2)}$`, de = "?" + $, be = `<${de}>`, A = document, M = () => A.createComment(""), U = (s) => s === null || typeof s != "object" && typeof s != "function", K = Array.isArray, xe = (s) => K(s) || typeof (s == null ? void 0 : s[Symbol.iterator]) == "function", B = `[ 	
-\f\r]`, k = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, te = /-->/g, ie = />/g, w = RegExp(`>|${B}(?:([^\\s"'>=/]+)(${B}*=${B}*(?:[^ 	
+\f\r]`, P = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, te = /-->/g, ie = />/g, w = RegExp(`>|${B}(?:([^\\s"'>=/]+)(${B}*=${B}*(?:[^ 	
 \f\r"'\`<>=]|("|')|))|$)`, "g"), se = /'/g, re = /"/g, ce = /^(?:script|style|textarea|title)$/i, Ae = (s) => (e, ...t) => ({ _$litType$: s, strings: e, values: t }), p = Ae(1), S = Symbol.for("lit-noChange"), c = Symbol.for("lit-nothing"), oe = /* @__PURE__ */ new WeakMap(), b = A.createTreeWalker(A, 129);
 function he(s, e) {
   if (!K(s) || !s.hasOwnProperty("raw")) throw Error("invalid template strings array");
@@ -293,13 +293,13 @@ function he(s, e) {
 }
 const Ee = (s, e) => {
   const t = s.length - 1, i = [];
-  let r, o = e === 2 ? "<svg>" : e === 3 ? "<math>" : "", n = k;
+  let r, o = e === 2 ? "<svg>" : e === 3 ? "<math>" : "", n = P;
   for (let l = 0; l < t; l++) {
     const a = s[l];
     let h, u, d = -1, _ = 0;
-    for (; _ < a.length && (n.lastIndex = _, u = n.exec(a), u !== null); ) _ = n.lastIndex, n === k ? u[1] === "!--" ? n = te : u[1] !== void 0 ? n = ie : u[2] !== void 0 ? (ce.test(u[2]) && (r = RegExp("</" + u[2], "g")), n = w) : u[3] !== void 0 && (n = w) : n === w ? u[0] === ">" ? (n = r ?? k, d = -1) : u[1] === void 0 ? d = -2 : (d = n.lastIndex - u[2].length, h = u[1], n = u[3] === void 0 ? w : u[3] === '"' ? re : se) : n === re || n === se ? n = w : n === te || n === ie ? n = k : (n = w, r = void 0);
+    for (; _ < a.length && (n.lastIndex = _, u = n.exec(a), u !== null); ) _ = n.lastIndex, n === P ? u[1] === "!--" ? n = te : u[1] !== void 0 ? n = ie : u[2] !== void 0 ? (ce.test(u[2]) && (r = RegExp("</" + u[2], "g")), n = w) : u[3] !== void 0 && (n = w) : n === w ? u[0] === ">" ? (n = r ?? P, d = -1) : u[1] === void 0 ? d = -2 : (d = n.lastIndex - u[2].length, h = u[1], n = u[3] === void 0 ? w : u[3] === '"' ? re : se) : n === re || n === se ? n = w : n === te || n === ie ? n = P : (n = w, r = void 0);
     const m = n === w && s[l + 1].startsWith("/>") ? " " : "";
-    o += n === k ? a + be : d >= 0 ? (i.push(h), a.slice(0, d) + le + a.slice(d) + $ + m) : a + $ + (d === -2 ? l : m);
+    o += n === P ? a + be : d >= 0 ? (i.push(h), a.slice(0, d) + le + a.slice(d) + $ + m) : a + $ + (d === -2 ? l : m);
   }
   return [he(s, o + (s[t] || "<?>") + (e === 2 ? "</svg>" : e === 3 ? "</math>" : "")), i];
 };
@@ -317,7 +317,7 @@ class T {
       if (r.nodeType === 1) {
         if (r.hasAttributes()) for (const d of r.getAttributeNames()) if (d.endsWith(le)) {
           const _ = u[n++], m = r.getAttribute(d).split($), R = /([.?@])?(.*)/.exec(_);
-          a.push({ type: 1, index: o, name: R[2], strings: m, ctor: R[1] === "." ? Pe : R[1] === "?" ? ke : R[1] === "@" ? Ce : z }), r.removeAttribute(d);
+          a.push({ type: 1, index: o, name: R[2], strings: m, ctor: R[1] === "." ? ke : R[1] === "?" ? Pe : R[1] === "@" ? Ce : z }), r.removeAttribute(d);
         } else d.startsWith($) && (a.push({ type: 6, index: o }), r.removeAttribute(d));
         if (ce.test(r.tagName)) {
           const d = r.textContent.split($), _ = d.length - 1;
@@ -340,12 +340,12 @@ class T {
     return i.innerHTML = e, i;
   }
 }
-function P(s, e, t = s, i) {
+function k(s, e, t = s, i) {
   var n, l;
   if (e === S) return e;
   let r = i !== void 0 ? (n = t._$Co) == null ? void 0 : n[i] : t._$Cl;
   const o = U(e) ? void 0 : e._$litDirective$;
-  return (r == null ? void 0 : r.constructor) !== o && ((l = r == null ? void 0 : r._$AO) == null || l.call(r, !1), o === void 0 ? r = void 0 : (r = new o(s), r._$AT(s, t, i)), i !== void 0 ? (t._$Co ?? (t._$Co = []))[i] = r : t._$Cl = r), r !== void 0 && (e = P(s, r._$AS(s, e.values), r, i)), e;
+  return (r == null ? void 0 : r.constructor) !== o && ((l = r == null ? void 0 : r._$AO) == null || l.call(r, !1), o === void 0 ? r = void 0 : (r = new o(s), r._$AT(s, t, i)), i !== void 0 ? (t._$Co ?? (t._$Co = []))[i] = r : t._$Cl = r), r !== void 0 && (e = k(s, r._$AS(s, e.values), r, i)), e;
 }
 class Se {
   constructor(e, t) {
@@ -395,7 +395,7 @@ class H {
     return this._$AB;
   }
   _$AI(e, t = this) {
-    e = P(this, e, t), U(e) ? e === c || e == null || e === "" ? (this._$AH !== c && this._$AR(), this._$AH = c) : e !== this._$AH && e !== S && this._(e) : e._$litType$ !== void 0 ? this.$(e) : e.nodeType !== void 0 ? this.T(e) : xe(e) ? this.k(e) : this._(e);
+    e = k(this, e, t), U(e) ? e === c || e == null || e === "" ? (this._$AH !== c && this._$AR(), this._$AH = c) : e !== this._$AH && e !== S && this._(e) : e._$litType$ !== void 0 ? this.$(e) : e.nodeType !== void 0 ? this.T(e) : xe(e) ? this.k(e) : this._(e);
   }
   O(e) {
     return this._$AA.parentNode.insertBefore(e, this._$AB);
@@ -451,11 +451,11 @@ class z {
   _$AI(e, t = this, i, r) {
     const o = this.strings;
     let n = !1;
-    if (o === void 0) e = P(this, e, t, 0), n = !U(e) || e !== this._$AH && e !== S, n && (this._$AH = e);
+    if (o === void 0) e = k(this, e, t, 0), n = !U(e) || e !== this._$AH && e !== S, n && (this._$AH = e);
     else {
       const l = e;
       let a, h;
-      for (e = o[0], a = 0; a < o.length - 1; a++) h = P(this, l[i + a], t, a), h === S && (h = this._$AH[a]), n || (n = !U(h) || h !== this._$AH[a]), h === c ? e = c : e !== c && (e += (h ?? "") + o[a + 1]), this._$AH[a] = h;
+      for (e = o[0], a = 0; a < o.length - 1; a++) h = k(this, l[i + a], t, a), h === S && (h = this._$AH[a]), n || (n = !U(h) || h !== this._$AH[a]), h === c ? e = c : e !== c && (e += (h ?? "") + o[a + 1]), this._$AH[a] = h;
     }
     n && !r && this.j(e);
   }
@@ -463,7 +463,7 @@ class z {
     e === c ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, e ?? "");
   }
 }
-class Pe extends z {
+class ke extends z {
   constructor() {
     super(...arguments), this.type = 3;
   }
@@ -471,7 +471,7 @@ class Pe extends z {
     this.element[this.name] = e === c ? void 0 : e;
   }
 }
-class ke extends z {
+class Pe extends z {
   constructor() {
     super(...arguments), this.type = 4;
   }
@@ -484,7 +484,7 @@ class Ce extends z {
     super(e, t, i, r, o), this.type = 5;
   }
   _$AI(e, t = this) {
-    if ((e = P(this, e, t, 0) ?? c) === S) return;
+    if ((e = k(this, e, t, 0) ?? c) === S) return;
     const i = this._$AH, r = e === c && i !== c || e.capture !== i.capture || e.once !== i.once || e.passive !== i.passive, o = e !== c && (i === c || r);
     r && this.element.removeEventListener(this.name, this, i), o && this.element.addEventListener(this.name, this, e), this._$AH = e;
   }
@@ -501,7 +501,7 @@ class Ve {
     return this._$AM._$AU;
   }
   _$AI(e) {
-    P(this, e);
+    k(this, e);
   }
 }
 const W = V.litHtmlPolyfillSupport;
@@ -956,14 +956,15 @@ let g = class extends O {
         ${i != null && i.needs_entity ? p`
               <div class="form-field">
                 <label>Entity</label>
-                <input
-                  type="text"
+                <ha-entity-picker
+                  .hass=${this.hass}
                   .value=${(e == null ? void 0 : e.entity_id) || ""}
-                  @input=${(o) => this._updateWidget(s, {
-      entity_id: o.target.value
+                  .includeDomains=${i.entity_domains || void 0}
+                  allow-custom-entity
+                  @value-changed=${(o) => this._updateWidget(s, {
+      entity_id: o.detail.value
     })}
-                  placeholder="sensor.example"
-                />
+                ></ha-entity-picker>
               </div>
             ` : c}
 
@@ -1181,6 +1182,11 @@ g.styles = ue`
     .form-field select:focus {
       outline: none;
       border-color: var(--primary-color);
+    }
+
+    .form-field ha-entity-picker {
+      display: block;
+      width: 100%;
     }
 
     /* Slots Grid */

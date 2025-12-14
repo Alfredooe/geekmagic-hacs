@@ -248,6 +248,11 @@ export class GeekMagicPanel extends LitElement {
       border-color: var(--primary-color);
     }
 
+    .form-field ha-entity-picker {
+      display: block;
+      width: 100%;
+    }
+
     /* Slots Grid */
     .slots-grid {
       display: grid;
@@ -806,15 +811,16 @@ export class GeekMagicPanel extends LitElement {
           ? html`
               <div class="form-field">
                 <label>Entity</label>
-                <input
-                  type="text"
+                <ha-entity-picker
+                  .hass=${this.hass}
                   .value=${widget?.entity_id || ""}
-                  @input=${(e: Event) =>
+                  .includeDomains=${schema.entity_domains || undefined}
+                  allow-custom-entity
+                  @value-changed=${(e: CustomEvent) =>
                     this._updateWidget(slot, {
-                      entity_id: (e.target as HTMLInputElement).value,
+                      entity_id: e.detail.value,
                     })}
-                  placeholder="sensor.example"
-                />
+                ></ha-entity-picker>
               </div>
             `
           : nothing}
