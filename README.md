@@ -57,61 +57,61 @@ Special thanks to:
 
 | Widget | 1x1 | 1x2 | 2x1 | 2x2 | 2x3 | 3x3 |
 |--------|-----|-----|-----|-----|-----|-----|
-| **Gauge (Bar)** | <img src="samples/widgets/gauge_bar_1x1.png" width="60"> | <img src="samples/widgets/gauge_bar_1x2.png" width="60"> | <img src="samples/widgets/gauge_bar_2x1.png" width="60"> | <img src="samples/widgets/gauge_bar_2x2.png" width="60"> | <img src="samples/widgets/gauge_bar_2x3.png" width="60"> | <img src="samples/widgets/gauge_bar_3x3.png" width="60"> |
-| **Gauge (Ring)** | <img src="samples/widgets/gauge_ring_1x1.png" width="60"> | <img src="samples/widgets/gauge_ring_1x2.png" width="60"> | <img src="samples/widgets/gauge_ring_2x1.png" width="60"> | <img src="samples/widgets/gauge_ring_2x2.png" width="60"> | <img src="samples/widgets/gauge_ring_2x3.png" width="60"> | <img src="samples/widgets/gauge_ring_3x3.png" width="60"> |
-| **Gauge (Arc)** | <img src="samples/widgets/gauge_arc_1x1.png" width="60"> | <img src="samples/widgets/gauge_arc_1x2.png" width="60"> | <img src="samples/widgets/gauge_arc_2x1.png" width="60"> | <img src="samples/widgets/gauge_arc_2x2.png" width="60"> | <img src="samples/widgets/gauge_arc_2x3.png" width="60"> | <img src="samples/widgets/gauge_arc_3x3.png" width="60"> |
-| **Entity (Icon)** | <img src="samples/widgets/entity_icon_1x1.png" width="60"> | <img src="samples/widgets/entity_icon_1x2.png" width="60"> | <img src="samples/widgets/entity_icon_2x1.png" width="60"> | <img src="samples/widgets/entity_icon_2x2.png" width="60"> | <img src="samples/widgets/entity_icon_2x3.png" width="60"> | <img src="samples/widgets/entity_icon_3x3.png" width="60"> |
-| **Entity (Plain)** | <img src="samples/widgets/entity_plain_1x1.png" width="60"> | <img src="samples/widgets/entity_plain_1x2.png" width="60"> | <img src="samples/widgets/entity_plain_2x1.png" width="60"> | <img src="samples/widgets/entity_plain_2x2.png" width="60"> | <img src="samples/widgets/entity_plain_2x3.png" width="60"> | <img src="samples/widgets/entity_plain_3x3.png" width="60"> |
-| **Clock** | <img src="samples/widgets/clock_1x1.png" width="60"> | <img src="samples/widgets/clock_1x2.png" width="60"> | <img src="samples/widgets/clock_2x1.png" width="60"> | <img src="samples/widgets/clock_2x2.png" width="60"> | <img src="samples/widgets/clock_2x3.png" width="60"> | <img src="samples/widgets/clock_3x3.png" width="60"> |
-| **Text** | <img src="samples/widgets/text_1x1.png" width="60"> | <img src="samples/widgets/text_1x2.png" width="60"> | <img src="samples/widgets/text_2x1.png" width="60"> | <img src="samples/widgets/text_2x2.png" width="60"> | <img src="samples/widgets/text_2x3.png" width="60"> | <img src="samples/widgets/text_3x3.png" width="60"> |
-| **Progress** | <img src="samples/widgets/progress_1x1.png" width="60"> | <img src="samples/widgets/progress_1x2.png" width="60"> | <img src="samples/widgets/progress_2x1.png" width="60"> | <img src="samples/widgets/progress_2x2.png" width="60"> | <img src="samples/widgets/progress_2x3.png" width="60"> | <img src="samples/widgets/progress_3x3.png" width="60"> |
-| **Weather** | <img src="samples/widgets/weather_1x1.png" width="60"> | <img src="samples/widgets/weather_1x2.png" width="60"> | <img src="samples/widgets/weather_2x1.png" width="60"> | <img src="samples/widgets/weather_2x2.png" width="60"> | <img src="samples/widgets/weather_2x3.png" width="60"> | <img src="samples/widgets/weather_3x3.png" width="60"> |
-| **Status** | <img src="samples/widgets/status_1x1.png" width="60"> | <img src="samples/widgets/status_1x2.png" width="60"> | <img src="samples/widgets/status_2x1.png" width="60"> | <img src="samples/widgets/status_2x2.png" width="60"> | <img src="samples/widgets/status_2x3.png" width="60"> | <img src="samples/widgets/status_3x3.png" width="60"> |
-| **Chart** | <img src="samples/widgets/chart_1x1.png" width="60"> | <img src="samples/widgets/chart_1x2.png" width="60"> | <img src="samples/widgets/chart_2x1.png" width="60"> | <img src="samples/widgets/chart_2x2.png" width="60"> | <img src="samples/widgets/chart_2x3.png" width="60"> | <img src="samples/widgets/chart_3x3.png" width="60"> |
+| **Gauge (Bar)** | <img src="samples/widgets/gauge_bar_1x1.png"> | <img src="samples/widgets/gauge_bar_1x2.png"> | <img src="samples/widgets/gauge_bar_2x1.png"> | <img src="samples/widgets/gauge_bar_2x2.png"> | <img src="samples/widgets/gauge_bar_2x3.png"> | <img src="samples/widgets/gauge_bar_3x3.png"> |
+| **Gauge (Ring)** | <img src="samples/widgets/gauge_ring_1x1.png"> | <img src="samples/widgets/gauge_ring_1x2.png"> | <img src="samples/widgets/gauge_ring_2x1.png"> | <img src="samples/widgets/gauge_ring_2x2.png"> | <img src="samples/widgets/gauge_ring_2x3.png"> | <img src="samples/widgets/gauge_ring_3x3.png"> |
+| **Gauge (Arc)** | <img src="samples/widgets/gauge_arc_1x1.png"> | <img src="samples/widgets/gauge_arc_1x2.png"> | <img src="samples/widgets/gauge_arc_2x1.png"> | <img src="samples/widgets/gauge_arc_2x2.png"> | <img src="samples/widgets/gauge_arc_2x3.png"> | <img src="samples/widgets/gauge_arc_3x3.png"> |
+| **Entity (Icon)** | <img src="samples/widgets/entity_icon_1x1.png"> | <img src="samples/widgets/entity_icon_1x2.png"> | <img src="samples/widgets/entity_icon_2x1.png"> | <img src="samples/widgets/entity_icon_2x2.png"> | <img src="samples/widgets/entity_icon_2x3.png"> | <img src="samples/widgets/entity_icon_3x3.png"> |
+| **Entity (Plain)** | <img src="samples/widgets/entity_plain_1x1.png"> | <img src="samples/widgets/entity_plain_1x2.png"> | <img src="samples/widgets/entity_plain_2x1.png"> | <img src="samples/widgets/entity_plain_2x2.png"> | <img src="samples/widgets/entity_plain_2x3.png"> | <img src="samples/widgets/entity_plain_3x3.png"> |
+| **Clock** | <img src="samples/widgets/clock_1x1.png"> | <img src="samples/widgets/clock_1x2.png"> | <img src="samples/widgets/clock_2x1.png"> | <img src="samples/widgets/clock_2x2.png"> | <img src="samples/widgets/clock_2x3.png"> | <img src="samples/widgets/clock_3x3.png"> |
+| **Text** | <img src="samples/widgets/text_1x1.png"> | <img src="samples/widgets/text_1x2.png"> | <img src="samples/widgets/text_2x1.png"> | <img src="samples/widgets/text_2x2.png"> | <img src="samples/widgets/text_2x3.png"> | <img src="samples/widgets/text_3x3.png"> |
+| **Progress** | <img src="samples/widgets/progress_1x1.png"> | <img src="samples/widgets/progress_1x2.png"> | <img src="samples/widgets/progress_2x1.png"> | <img src="samples/widgets/progress_2x2.png"> | <img src="samples/widgets/progress_2x3.png"> | <img src="samples/widgets/progress_3x3.png"> |
+| **Weather** | <img src="samples/widgets/weather_1x1.png"> | <img src="samples/widgets/weather_1x2.png"> | <img src="samples/widgets/weather_2x1.png"> | <img src="samples/widgets/weather_2x2.png"> | <img src="samples/widgets/weather_2x3.png"> | <img src="samples/widgets/weather_3x3.png"> |
+| **Status** | <img src="samples/widgets/status_1x1.png"> | <img src="samples/widgets/status_1x2.png"> | <img src="samples/widgets/status_2x1.png"> | <img src="samples/widgets/status_2x2.png"> | <img src="samples/widgets/status_2x3.png"> | <img src="samples/widgets/status_3x3.png"> |
+| **Chart** | <img src="samples/widgets/chart_1x1.png"> | <img src="samples/widgets/chart_1x2.png"> | <img src="samples/widgets/chart_2x1.png"> | <img src="samples/widgets/chart_2x2.png"> | <img src="samples/widgets/chart_2x3.png"> | <img src="samples/widgets/chart_3x3.png"> |
 
 ## Layout Examples
 
 ### Fullscreen & Grid Layouts
 
 <p align="center">
-  <img src="samples/layouts/layout_fullscreen.png" alt="Fullscreen" width="100">
-  <img src="samples/layouts/layout_grid_2x2.png" alt="Grid 2x2" width="100">
-  <img src="samples/layouts/layout_grid_2x3.png" alt="Grid 2x3" width="100">
-  <img src="samples/layouts/layout_grid_3x2.png" alt="Grid 3x2" width="100">
-  <img src="samples/layouts/layout_grid_3x3.png" alt="Grid 3x3" width="100">
+  <img src="samples/layouts/layout_fullscreen.png" alt="Fullscreen" width="200">
+  <img src="samples/layouts/layout_grid_2x2.png" alt="Grid 2x2" width="200">
+  <img src="samples/layouts/layout_grid_2x3.png" alt="Grid 2x3" width="200">
+  <img src="samples/layouts/layout_grid_3x2.png" alt="Grid 3x2" width="200">
+  <img src="samples/layouts/layout_grid_3x3.png" alt="Grid 3x3" width="200">
 </p>
 
 ### Split Layouts
 
 <p align="center">
-  <img src="samples/layouts/layout_split_horizontal.png" alt="Split Horizontal" width="100">
-  <img src="samples/layouts/layout_split_vertical.png" alt="Split Vertical" width="100">
-  <img src="samples/layouts/layout_split_h_1_2.png" alt="Split 1:2" width="100">
-  <img src="samples/layouts/layout_split_h_2_1.png" alt="Split 2:1" width="100">
+  <img src="samples/layouts/layout_split_horizontal.png" alt="Split Horizontal" width="200">
+  <img src="samples/layouts/layout_split_vertical.png" alt="Split Vertical" width="200">
+  <img src="samples/layouts/layout_split_h_1_2.png" alt="Split 1:2" width="200">
+  <img src="samples/layouts/layout_split_h_2_1.png" alt="Split 2:1" width="200">
 </p>
 
 ### Column & Row Layouts
 
 <p align="center">
-  <img src="samples/layouts/layout_three_column.png" alt="Three Column" width="100">
-  <img src="samples/layouts/layout_three_row.png" alt="Three Row" width="100">
+  <img src="samples/layouts/layout_three_column.png" alt="Three Column" width="200">
+  <img src="samples/layouts/layout_three_row.png" alt="Three Row" width="200">
 </p>
 
 ### Hero Layouts
 
 <p align="center">
-  <img src="samples/layouts/layout_hero.png" alt="Hero" width="100">
-  <img src="samples/layouts/layout_hero_corner_tl.png" alt="Hero TL" width="100">
-  <img src="samples/layouts/layout_hero_corner_tr.png" alt="Hero TR" width="100">
-  <img src="samples/layouts/layout_hero_corner_bl.png" alt="Hero BL" width="100">
-  <img src="samples/layouts/layout_hero_corner_br.png" alt="Hero BR" width="100">
+  <img src="samples/layouts/layout_hero.png" alt="Hero" width="200">
+  <img src="samples/layouts/layout_hero_corner_tl.png" alt="Hero TL" width="200">
+  <img src="samples/layouts/layout_hero_corner_tr.png" alt="Hero TR" width="200">
+  <img src="samples/layouts/layout_hero_corner_bl.png" alt="Hero BL" width="200">
+  <img src="samples/layouts/layout_hero_corner_br.png" alt="Hero BR" width="200">
 </p>
 
 ### Sidebar Layouts
 
 <p align="center">
-  <img src="samples/layouts/layout_sidebar_left.png" alt="Sidebar Left" width="100">
-  <img src="samples/layouts/layout_sidebar_right.png" alt="Sidebar Right" width="100">
+  <img src="samples/layouts/layout_sidebar_left.png" alt="Sidebar Left" width="200">
+  <img src="samples/layouts/layout_sidebar_right.png" alt="Sidebar Right" width="200">
 </p>
 
 ## Themes
@@ -122,14 +122,14 @@ Choose from **10 built-in themes** that go beyond just colors - affecting typogr
 
 | Classic | Minimal | Neon | Retro | Soft |
 |:-------:|:-------:|:----:|:-----:|:----:|
-| <img src="samples/layouts/layout_theme_classic.png" alt="Classic" width="100"> | <img src="samples/layouts/layout_theme_minimal.png" alt="Minimal" width="100"> | <img src="samples/layouts/layout_theme_neon.png" alt="Neon" width="100"> | <img src="samples/layouts/layout_theme_retro.png" alt="Retro" width="100"> | <img src="samples/layouts/layout_theme_soft.png" alt="Soft" width="100"> |
+| <img src="samples/layouts/layout_theme_classic.png" alt="Classic" width="200"> | <img src="samples/layouts/layout_theme_minimal.png" alt="Minimal" width="200"> | <img src="samples/layouts/layout_theme_neon.png" alt="Neon" width="200"> | <img src="samples/layouts/layout_theme_retro.png" alt="Retro" width="200"> | <img src="samples/layouts/layout_theme_soft.png" alt="Soft" width="200"> |
 | Balanced with rounded corners | Sharp, monochrome | Cyberpunk with glow | Terminal scanlines | Cozy, very rounded |
 
 ### Colored & Light Themes
 
 | Ocean | Sunset | Forest | Light | Candy |
 |:-----:|:------:|:------:|:-----:|:-----:|
-| <img src="samples/layouts/layout_theme_ocean.png" alt="Ocean" width="100"> | <img src="samples/layouts/layout_theme_sunset.png" alt="Sunset" width="100"> | <img src="samples/layouts/layout_theme_forest.png" alt="Forest" width="100"> | <img src="samples/layouts/layout_theme_light.png" alt="Light" width="100"> | <img src="samples/layouts/layout_theme_candy.png" alt="Candy" width="100"> |
+| <img src="samples/layouts/layout_theme_ocean.png" alt="Ocean" width="200"> | <img src="samples/layouts/layout_theme_sunset.png" alt="Sunset" width="200"> | <img src="samples/layouts/layout_theme_forest.png" alt="Forest" width="200"> | <img src="samples/layouts/layout_theme_light.png" alt="Light" width="200"> | <img src="samples/layouts/layout_theme_candy.png" alt="Candy" width="200"> |
 | Deep blue, nautical | Warm coral/orange | Natural earth tones | Clean white background | Playful pastels |
 
 ---
