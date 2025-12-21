@@ -28,7 +28,9 @@ jobs:
         run: uv tool install pre-commit
 
       - name: Run pre-commit (ruff lint + format)
-        run: pre-commit run --all-files ruff ruff-format
+        run: |
+          pre-commit run --all-files ruff
+          pre-commit run --all-files ruff-format
 
   test:
     name: Test
