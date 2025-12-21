@@ -207,6 +207,26 @@ class RenderContext:
             bold=bold,
         )
 
+    def get_font_for_height(
+        self,
+        target_height: int,
+        bold: bool = False,
+    ) -> FreeTypeFont | ImageFont:
+        """Get a font at a specific target height in unscaled pixels.
+
+        Useful for scaling fonts proportionally from a measured size.
+
+        Args:
+            target_height: Desired font height in unscaled pixels
+            bold: Whether to use bold variant
+
+        Returns:
+            Font at approximately the target height
+        """
+        # Scale for supersampling
+        scaled_height = target_height * self._renderer.scale
+        return self._renderer.get_scaled_font("primary", scaled_height, bold=bold)
+
     def get_text_size(
         self,
         text: str,

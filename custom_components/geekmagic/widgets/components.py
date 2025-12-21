@@ -622,6 +622,269 @@ class Padding(Component):
 
 
 # ============================================================================
+# Hierarchy and Priority Components
+# ============================================================================
+
+
+@dataclass
+class FillText(Component):
+    """Text that fills available space while maintaining aspect ratio.
+
+    Primary text fills the container, secondary/tertiary scale proportionally.
+    This is the preferred component for dynamic text sizing.
+
+    Args:
+        text: Text to display
+        hierarchy: Size hierarchy - "primary" fills, "secondary"/"tertiary" scale smaller
+        bold: Whether to use bold font
+        color: Text color
+        max_ratio: Maximum container fill ratio (0.95 = 95% of container)
+        min_size: Minimum font size in pixels
+    """
+
+    text: str
+    hierarchy: Literal["primary", "secondary", "tertiary"] = "primary"
+    bold: bool = False
+    color: Color = COLOR_WHITE
+    max_ratio: float = 0.95
+    min_size: int = 12
+
+    # Scaling ratios relative to primary
+    _RATIOS: dict[str, float] = field(
+        default_factory=lambda: {"primary": 1.0, "secondary": 0.50, "tertiary": 0.30},
+        repr=False,
+    )
+
+    def _get_font(self, ctx: RenderContext, width: int, height: int):
+        """Get font sized for hierarchy and container."""
+        ratio = self._RATIOS.get(self.hierarchy, 1.0)
+
+        # Primary: fit to container
+        if self.hierarchy == "primary":
+            return ctx.fit_text(
+                self.text,
+                max_width=int(width * self.max_ratio),
+                max_height=int(height * self.max_ratio),
+                bold=self.bold,
+            )
+        # Secondary/tertiary: scale from what primary would be
+        primary_font = ctx.fit_text(
+            self.text,
+            max_width=int(width * self.max_ratio),
+            max_height=int(height * self.max_ratio),
+            bold=self.bold,
+        )
+        # Get primary height and scale
+        primary_height = ctx.get_text_size("Hg", primary_font)[1]
+        target_height = max(self.min_size, int(primary_height * ratio))
+        # Get font at target height
+        return ctx.get_font_for_height(target_height, bold=self.bold)
+
+    def measure(self, ctx: RenderContext, max_width: int, max_height: int) -> tuple[int, int]:
+        font = self._get_font(ctx, max_width, max_height)
+        return ctx.get_text_size(self.text, font)
+
+    def render(self, ctx: RenderContext, x: int, y: int, width: int, height: int) -> None:
+        font = self._get_font(ctx, width, height)
+        _, text_h = ctx.get_text_size(self.text, font)
+
+        # Check minimum size constraint
+        if text_h < self.min_size:
+            return  # Too small, skip
+
+        # Center in container
+        tx = x + width // 2
+        ty = y + height // 2
+        ctx.draw_text(self.text, (tx, ty), font, self.color, anchor="mm")
+
+
+@dataclass
+class Prioritized(Component):
+    """Wrapper that adds priority to any component for responsive hiding.
+
+    Use with PriorityColumn or PriorityRow to enable auto-hiding of
+    low-priority elements when space is insufficient.
+
+    Args:
+        child: The component to wrap
+        priority: Display priority (CRITICAL always shows, LOW hides first)
+        min_width: Minimum width needed to show this element
+        min_height: Minimum height needed to show this element
+    """
+
+    child: Component
+    priority: int = 1  # Priority.CRITICAL
+    min_width: int = 0
+    min_height: int = 0
+
+    def measure(self, ctx: RenderContext, max_width: int, max_height: int) -> tuple[int, int]:
+        return self.child.measure(ctx, max_width, max_height)
+
+    def render(self, ctx: RenderContext, x: int, y: int, width: int, height: int) -> None:
+        self.child.render(ctx, x, y, width, height)
+
+
+@dataclass
+class PriorityColumn(Component):
+    """Column that auto-hides low-priority children when space is insufficient.
+
+    Children are sorted by priority. Starting from highest priority (CRITICAL),
+    children are allocated space. When remaining space is insufficient for
+    the next child, it and all lower-priority children are hidden.
+
+    Args:
+        children: List of Prioritized components
+        gap: Gap between visible children
+        align: Horizontal alignment of children
+        padding: Padding around all children
+    """
+
+    children: list[Prioritized] = field(default_factory=list)
+    gap: int = 4
+    align: Align = "center"
+    padding: int = 0
+
+    def _filter_visible(self, ctx: RenderContext, width: int, height: int) -> list[Prioritized]:
+        """Determine which children fit based on priority."""
+        if not self.children:
+            return []
+
+        # Sort by priority (lower number = higher priority)
+        sorted_children = sorted(self.children, key=lambda c: c.priority)
+
+        available = height - self.padding * 2
+        visible: list[Prioritized] = []
+        gap_used = 0
+
+        for child in sorted_children:
+            needed_h = child.measure(ctx, width - self.padding * 2, available)[1]
+
+            # Check if child fits with its minimum requirements
+            fits_space = needed_h + gap_used <= available
+            fits_min = (
+                needed_h >= child.min_height and (width - self.padding * 2) >= child.min_width
+            )
+
+            if fits_space and fits_min:
+                visible.append(child)
+                available -= needed_h + self.gap
+                gap_used = self.gap
+            elif child.priority == 1:  # Priority.CRITICAL
+                # Critical elements always show, even if cramped
+                visible.append(child)
+                available -= needed_h + self.gap
+                gap_used = self.gap
+
+        return visible
+
+    def measure(self, ctx: RenderContext, max_width: int, max_height: int) -> tuple[int, int]:
+        visible = self._filter_visible(ctx, max_width, max_height)
+        if not visible:
+            return (0, 0)
+
+        inner_w = max_width - self.padding * 2
+        total_h = self.padding * 2 + self.gap * max(0, len(visible) - 1)
+        max_w = 0
+
+        for child in visible:
+            w, h = child.measure(ctx, inner_w, max_height)
+            total_h += h
+            max_w = max(max_w, w)
+
+        return (min(max_w + self.padding * 2, max_width), min(total_h, max_height))
+
+    def render(self, ctx: RenderContext, x: int, y: int, width: int, height: int) -> None:
+        visible = self._filter_visible(ctx, width, height)
+        if not visible:
+            return
+
+        # Delegate to Column for actual layout
+        Column(
+            children=[c.child for c in visible],
+            gap=self.gap,
+            align=self.align,
+            padding=self.padding,
+            justify="center",
+        ).render(ctx, x, y, width, height)
+
+
+@dataclass
+class PriorityRow(Component):
+    """Row that auto-hides low-priority children when space is insufficient.
+
+    Same as PriorityColumn but for horizontal layout.
+
+    Args:
+        children: List of Prioritized components
+        gap: Gap between visible children
+        align: Vertical alignment of children
+        justify: Horizontal distribution of children
+        padding: Padding around all children
+    """
+
+    children: list[Prioritized] = field(default_factory=list)
+    gap: int = 4
+    align: Align = "center"
+    justify: Justify = "space-between"
+    padding: int = 0
+
+    def _filter_visible(self, ctx: RenderContext, width: int, height: int) -> list[Prioritized]:
+        """Determine which children fit based on priority."""
+        if not self.children:
+            return []
+
+        sorted_children = sorted(self.children, key=lambda c: c.priority)
+
+        available = width - self.padding * 2
+        visible: list[Prioritized] = []
+        gap_used = 0
+
+        for child in sorted_children:
+            needed_w = child.measure(ctx, available, height - self.padding * 2)[0]
+
+            fits_space = needed_w + gap_used <= available
+            fits_min = (
+                needed_w >= child.min_width and (height - self.padding * 2) >= child.min_height
+            )
+
+            if (fits_space and fits_min) or child.priority == 1:
+                visible.append(child)
+                available -= needed_w + self.gap
+                gap_used = self.gap
+
+        return visible
+
+    def measure(self, ctx: RenderContext, max_width: int, max_height: int) -> tuple[int, int]:
+        visible = self._filter_visible(ctx, max_width, max_height)
+        if not visible:
+            return (0, 0)
+
+        inner_h = max_height - self.padding * 2
+        total_w = self.padding * 2 + self.gap * max(0, len(visible) - 1)
+        max_h = 0
+
+        for child in visible:
+            w, h = child.measure(ctx, max_width, inner_h)
+            total_w += w
+            max_h = max(max_h, h)
+
+        return (min(total_w, max_width), min(max_h + self.padding * 2, max_height))
+
+    def render(self, ctx: RenderContext, x: int, y: int, width: int, height: int) -> None:
+        visible = self._filter_visible(ctx, width, height)
+        if not visible:
+            return
+
+        Row(
+            children=[c.child for c in visible],
+            gap=self.gap,
+            align=self.align,
+            justify=self.justify,
+            padding=self.padding,
+        ).render(ctx, x, y, width, height)
+
+
+# ============================================================================
 # Export all components
 # ============================================================================
 
@@ -635,10 +898,14 @@ __all__ = [
     "Column",
     "Component",
     "Empty",
+    "FillText",
     "Icon",
     "Justify",
     "Padding",
     "Panel",
+    "Prioritized",
+    "PriorityColumn",
+    "PriorityRow",
     "Ring",
     "Row",
     "Spacer",
