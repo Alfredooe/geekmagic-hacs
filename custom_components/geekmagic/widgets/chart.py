@@ -28,14 +28,10 @@ class ChartDisplay(Component):
     fill: bool = False
     gradient: bool = False
 
-    def measure(
-        self, ctx: RenderContext, max_width: int, max_height: int
-    ) -> tuple[int, int]:
+    def measure(self, ctx: RenderContext, max_width: int, max_height: int) -> tuple[int, int]:
         return (max_width, max_height)
 
-    def render(
-        self, ctx: RenderContext, x: int, y: int, width: int, height: int
-    ) -> None:
+    def render(self, ctx: RenderContext, x: int, y: int, width: int, height: int) -> None:
         """Render chart with header, sparkline, and optional range."""
         font_label = ctx.get_font("small")
         font_value = ctx.get_font("regular")
@@ -44,7 +40,10 @@ class ChartDisplay(Component):
         # Calculate chart area
         header_height = int(height * 0.15) if self.label else int(height * 0.08)
         is_binary = self._is_binary_data()
-        footer_height = int(height * 0.12) if self.show_range and not is_binary else int(height * 0.04)
+        if self.show_range and not is_binary:
+            footer_height = int(height * 0.12)
+        else:
+            footer_height = int(height * 0.04)
         chart_top = y + header_height
         chart_bottom = y + height - footer_height
         chart_rect = (x + padding, chart_top, x + width - padding, chart_bottom)
@@ -105,7 +104,9 @@ class ChartDisplay(Component):
         else:
             center_x = x + width // 2
             center_y = (chart_top + chart_bottom) // 2
-            ctx.draw_text("No data", (center_x, center_y), font=font_label, color=COLOR_GRAY, anchor="mm")
+            ctx.draw_text(
+                "No data", (center_x, center_y), font=font_label, color=COLOR_GRAY, anchor="mm"
+            )
 
     def _is_binary_data(self) -> bool:
         """Check if data is binary (all 0.0 or 1.0)."""
@@ -137,7 +138,7 @@ class ChartWidget(Widget):
             self.hours = config.options.get("hours", 24)
         self.show_value = config.options.get("show_value", True)
         self.show_range = config.options.get("show_range", True)
-        self.fill = config.options.get("fill", False)
+        self.fill = config.options.get("fill", True)  # Default to filled area
         self.color_gradient = config.options.get("color_gradient", False)
 
     def render(self, ctx: RenderContext, state: WidgetState) -> Component:

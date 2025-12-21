@@ -41,14 +41,10 @@ class NowPlaying(Component):
     show_album: bool = False
     show_progress: bool = True
 
-    def measure(
-        self, ctx: RenderContext, max_width: int, max_height: int
-    ) -> tuple[int, int]:
+    def measure(self, ctx: RenderContext, max_width: int, max_height: int) -> tuple[int, int]:
         return (max_width, max_height)
 
-    def render(
-        self, ctx: RenderContext, x: int, y: int, width: int, height: int
-    ) -> None:
+    def render(self, ctx: RenderContext, x: int, y: int, width: int, height: int) -> None:
         """Render now playing info."""
         center_x = x + width // 2
         font_label = ctx.get_font("small")
@@ -58,13 +54,17 @@ class NowPlaying(Component):
 
         # Truncate text
         max_chars = (width - padding * 2) // 8
-        title = self.title[:max_chars - 2] + ".." if len(self.title) > max_chars else self.title
-        artist = self.artist[:max_chars - 2] + ".." if len(self.artist) > max_chars else self.artist
+        title = self.title[: max_chars - 2] + ".." if len(self.title) > max_chars else self.title
+        artist = (
+            self.artist[: max_chars - 2] + ".." if len(self.artist) > max_chars else self.artist
+        )
 
         current_y = y + int(height * 0.12)
 
         # Draw "NOW PLAYING"
-        ctx.draw_text("NOW PLAYING", (center_x, current_y), font=font_label, color=COLOR_GRAY, anchor="mm")
+        ctx.draw_text(
+            "NOW PLAYING", (center_x, current_y), font=font_label, color=COLOR_GRAY, anchor="mm"
+        )
         current_y += int(height * 0.20)
 
         # Draw title
@@ -73,13 +73,19 @@ class NowPlaying(Component):
 
         # Draw artist
         if self.show_artist and artist:
-            ctx.draw_text(artist, (center_x, current_y), font=font_small, color=COLOR_GRAY, anchor="mm")
+            ctx.draw_text(
+                artist, (center_x, current_y), font=font_small, color=COLOR_GRAY, anchor="mm"
+            )
             current_y += int(height * 0.15)
 
         # Draw album
         if self.show_album and self.album:
-            album = self.album[:max_chars - 2] + ".." if len(self.album) > max_chars else self.album
-            ctx.draw_text(album, (center_x, current_y), font=font_small, color=COLOR_GRAY, anchor="mm")
+            album = (
+                self.album[: max_chars - 2] + ".." if len(self.album) > max_chars else self.album
+            )
+            ctx.draw_text(
+                album, (center_x, current_y), font=font_small, color=COLOR_GRAY, anchor="mm"
+            )
 
         # Draw progress bar
         if self.show_progress and self.duration > 0:
@@ -93,22 +99,26 @@ class NowPlaying(Component):
             pos_str = _format_time(self.position)
             dur_str = _format_time(self.duration)
             time_y = bar_y + int(height * 0.12)
-            ctx.draw_text(pos_str, (x + padding, time_y), font=font_small, color=COLOR_GRAY, anchor="lm")
-            ctx.draw_text(dur_str, (x + width - padding, time_y), font=font_small, color=COLOR_GRAY, anchor="rm")
+            ctx.draw_text(
+                pos_str, (x + padding, time_y), font=font_small, color=COLOR_GRAY, anchor="lm"
+            )
+            ctx.draw_text(
+                dur_str,
+                (x + width - padding, time_y),
+                font=font_small,
+                color=COLOR_GRAY,
+                anchor="rm",
+            )
 
 
 @dataclass
 class MediaIdle(Component):
     """Idle/paused state display."""
 
-    def measure(
-        self, ctx: RenderContext, max_width: int, max_height: int
-    ) -> tuple[int, int]:
+    def measure(self, ctx: RenderContext, max_width: int, max_height: int) -> tuple[int, int]:
         return (max_width, max_height)
 
-    def render(
-        self, ctx: RenderContext, x: int, y: int, width: int, height: int
-    ) -> None:
+    def render(self, ctx: RenderContext, x: int, y: int, width: int, height: int) -> None:
         """Render paused state."""
         center_x = x + width // 2
         center_y = y + height // 2
@@ -119,13 +129,29 @@ class MediaIdle(Component):
         bar_height = max(15, int(height * 0.25))
         gap = max(5, int(width * 0.05))
 
-        left_bar = (center_x - gap - bar_width, center_y - bar_height // 2, center_x - gap, center_y + bar_height // 2)
-        right_bar = (center_x + gap, center_y - bar_height // 2, center_x + gap + bar_width, center_y + bar_height // 2)
+        left_bar = (
+            center_x - gap - bar_width,
+            center_y - bar_height // 2,
+            center_x - gap,
+            center_y + bar_height // 2,
+        )
+        right_bar = (
+            center_x + gap,
+            center_y - bar_height // 2,
+            center_x + gap + bar_width,
+            center_y + bar_height // 2,
+        )
 
         ctx.draw_rect(left_bar, fill=COLOR_GRAY)
         ctx.draw_rect(right_bar, fill=COLOR_GRAY)
 
-        ctx.draw_text("PAUSED", (center_x, center_y + int(height * 0.29)), font=font_label, color=COLOR_GRAY, anchor="mm")
+        ctx.draw_text(
+            "PAUSED",
+            (center_x, center_y + int(height * 0.29)),
+            font=font_label,
+            color=COLOR_GRAY,
+            anchor="mm",
+        )
 
 
 class MediaWidget(Widget):

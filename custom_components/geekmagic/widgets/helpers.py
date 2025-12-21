@@ -55,6 +55,67 @@ def truncate_text(
     return text[:available] + ellipsis
 
 
+def format_number(
+    value: float | str,
+    precision: int = 1,
+    threshold: float = 1000,
+) -> str:
+    """Format large numbers with K/M/B suffixes.
+
+    Examples:
+        - 500 -> "500"
+        - 1000 -> "1k"
+        - 1500 -> "1.5k"
+        - 12000 -> "12k"
+        - 1000000 -> "1M"
+        - 1500000 -> "1.5M"
+        - 1000000000 -> "1B"
+
+    Args:
+        value: Number to format (can be float, int, or string)
+        precision: Decimal places for formatted numbers (default: 1)
+        threshold: Minimum value to start abbreviating (default: 1000)
+
+    Returns:
+        Formatted string
+    """
+    # Convert to float if string
+    if isinstance(value, str):
+        try:
+            value = float(value)
+        except (ValueError, TypeError):
+            return str(value)  # Return original string if not a number
+
+    # Handle negative numbers
+    if value < 0:
+        return "-" + format_number(-value, precision, threshold)
+
+    # Don't abbreviate small numbers
+    if abs(value) < threshold:
+        # Return integer if whole number, otherwise with decimals
+        if value == int(value):
+            return str(int(value))
+        return f"{value:.{precision}f}".rstrip("0").rstrip(".")
+
+    # Define suffixes and their magnitudes
+    suffixes = [
+        (1_000_000_000_000, "T"),  # Trillion
+        (1_000_000_000, "B"),  # Billion
+        (1_000_000, "M"),  # Million
+        (1_000, "k"),  # Thousand
+    ]
+
+    for magnitude, suffix in suffixes:
+        if abs(value) >= magnitude:
+            formatted = value / magnitude
+            # Remove trailing zeros
+            result = f"{formatted:.{precision}f}".rstrip("0").rstrip(".")
+            return f"{result}{suffix}"
+
+    # Shouldn't reach here, but just in case
+    return str(value)
+
+
 def extract_numeric(
     state: State | None,
     attribute: str | None = None,
@@ -328,23 +389,34 @@ def estimate_max_chars(
 
 
 def format_value_with_unit(
-    value: str,
+    value: str | float,
     unit: str,
     separator: str = "",
+    abbreviate: bool = False,
+    threshold: float = 1000,
 ) -> str:
     """Format value with optional unit.
 
     Args:
-        value: Value string
+        value: Value string or number
         unit: Unit string (can be empty)
         separator: Separator between value and unit
+        abbreviate: Whether to abbreviate large numbers (1k, 1M, etc.)
+        threshold: Minimum value to start abbreviating (default: 1000)
 
     Returns:
-        Formatted string like "23.5°C" or "23.5"
+        Formatted string like "23.5°C" or "1.5k views"
     """
+    # Abbreviate if requested
+    if abbreviate and isinstance(value, (int, float)):
+        value = format_number(value, threshold=threshold)
+    elif abbreviate and isinstance(value, str):
+        with contextlib.suppress(ValueError, TypeError):
+            value = format_number(float(value), threshold=threshold)
+
     if unit:
         return f"{value}{separator}{unit}"
-    return value
+    return str(value)
 
 
 def extract_state_value(

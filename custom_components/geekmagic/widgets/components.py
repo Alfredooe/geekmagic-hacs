@@ -884,6 +884,84 @@ class PriorityRow(Component):
         ).render(ctx, x, y, width, height)
 
 
+@dataclass
+class IconValueDisplay(Component):
+    """Icon with value and label - handles layout internally for proper sizing.
+
+    Vertical layout: Icon at top, value in middle (fills space), label at bottom.
+    All sizing is computed together to ensure proper proportions.
+    """
+
+    icon: str
+    value: str
+    label: str
+    icon_color: tuple[int, int, int] = COLOR_WHITE
+    value_color: tuple[int, int, int] = COLOR_WHITE
+    label_color: tuple[int, int, int] = (128, 128, 128)
+    icon_size: int | None = None
+
+    def measure(self, ctx: RenderContext, max_width: int, max_height: int) -> tuple[int, int]:
+        return (max_width, max_height)
+
+    def render(self, ctx: RenderContext, x: int, y: int, width: int, height: int) -> None:
+        """Render icon, value, and label with proper proportions."""
+        padding = int(width * 0.06)
+        inner_width = width - padding * 2
+        inner_height = height - padding * 2
+
+        # Calculate sizes based on container
+        icon_size = self.icon_size or max(16, min(48, int(inner_height * 0.25)))
+        label_height = int(inner_height * 0.15)
+        value_height = inner_height - icon_size - label_height - 12  # gaps
+
+        # Vertical positions (centered)
+        total_content = icon_size + value_height + label_height + 12
+        start_y = y + padding + (inner_height - total_content) // 2
+
+        center_x = x + width // 2
+        current_y = start_y
+
+        # Draw icon at top
+        ctx.draw_icon(
+            self.icon,
+            (center_x - icon_size // 2, current_y),
+            size=icon_size,
+            color=self.icon_color,
+        )
+        current_y += icon_size + 6
+
+        # Draw value (fills available space)
+        value_font = ctx.fit_text(
+            self.value,
+            max_width=int(inner_width * 0.95),
+            max_height=int(value_height * 0.90),
+            bold=True,
+        )
+        ctx.draw_text(
+            self.value,
+            (center_x, current_y + value_height // 2),
+            font=value_font,
+            color=self.value_color,
+            anchor="mm",
+        )
+        current_y += value_height + 6
+
+        # Draw label at bottom
+        label_font = ctx.fit_text(
+            self.label.upper(),
+            max_width=int(inner_width * 0.90),
+            max_height=int(label_height * 0.90),
+            bold=False,
+        )
+        ctx.draw_text(
+            self.label.upper(),
+            (center_x, current_y + label_height // 2),
+            font=label_font,
+            color=self.label_color,
+            anchor="mm",
+        )
+
+
 # ============================================================================
 # Export all components
 # ============================================================================
@@ -900,6 +978,7 @@ __all__ = [
     "Empty",
     "FillText",
     "Icon",
+    "IconValueDisplay",
     "Justify",
     "Padding",
     "Panel",

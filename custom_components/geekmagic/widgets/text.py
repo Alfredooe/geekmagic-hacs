@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Literal
 
 from ..const import COLOR_GRAY, COLOR_WHITE
 from .base import Widget, WidgetConfig
-from .components import Column, Component, Text
+from .components import Color, Component
 
 if TYPE_CHECKING:
     from ..render_context import RenderContext
@@ -19,6 +20,88 @@ ALIGN_MAP: dict[str, Literal["start", "center", "end"]] = {
     "center": "center",
     "right": "end",
 }
+
+
+@dataclass
+class TextDisplay(Component):
+    """Text display component that fills available space.
+
+    The main text automatically sizes to fill the container.
+    Optional label appears above the main text.
+    """
+
+    text: str
+    label: str | None = None
+    color: Color = COLOR_WHITE
+    label_color: Color = COLOR_GRAY
+    align: Literal["start", "center", "end"] = "center"
+
+    def measure(self, ctx: RenderContext, max_width: int, max_height: int) -> tuple[int, int]:
+        return (max_width, max_height)
+
+    def render(self, ctx: RenderContext, x: int, y: int, width: int, height: int) -> None:
+        """Render text filling available space."""
+        padding = int(width * 0.05)
+        inner_width = width - padding * 2
+        inner_height = height - padding * 2
+
+        # Calculate vertical space distribution
+        label_height = 0
+        gap = 4
+
+        if self.label:
+            label_height = int(inner_height * 0.15)
+
+        # Text gets remaining space
+        text_height = inner_height - label_height
+        if self.label:
+            text_height -= gap
+
+        # Vertical centering
+        total_content = label_height + text_height
+        if self.label:
+            total_content += gap
+        start_y = y + padding + (inner_height - total_content) // 2
+
+        current_y = start_y
+
+        # Horizontal alignment
+        if self.align == "start":
+            text_x = x + padding
+            anchor_h = "l"
+        elif self.align == "end":
+            text_x = x + width - padding
+            anchor_h = "r"
+        else:
+            text_x = x + width // 2
+            anchor_h = "m"
+
+        # Draw label if provided
+        if self.label:
+            label_font = ctx.get_font("small")
+            ctx.draw_text(
+                self.label.upper(),
+                (x + width // 2, current_y + label_height // 2),
+                font=label_font,
+                color=self.label_color,
+                anchor="mm",
+            )
+            current_y += label_height + gap
+
+        # Draw main text (fills available space)
+        text_font = ctx.fit_text(
+            self.text,
+            max_width=int(inner_width * 0.95),
+            max_height=int(text_height * 0.90),
+            bold=False,
+        )
+        ctx.draw_text(
+            self.text,
+            (text_x, current_y + text_height // 2),
+            font=text_font,
+            color=self.color,
+            anchor=f"{anchor_h}m",
+        )
 
 
 class TextWidget(Widget):
@@ -47,20 +130,11 @@ class TextWidget(Widget):
         color = self.config.color or COLOR_WHITE
         align = ALIGN_MAP.get(self.align, "center")
 
-        children: list[Component] = []
-
-        # Add label at top if provided
-        if self.config.label:
-            children.append(Text(self.config.label.upper(), font="small", color=COLOR_GRAY))
-
-        # Main text
-        children.append(Text(text, font=self.size, color=color, align=align))
-
-        return Column(
-            children=children,
-            align="center",
-            justify="center",
-            gap=4,
+        return TextDisplay(
+            text=text,
+            label=self.config.label,
+            color=color,
+            align=align,
         )
 
     def _get_text(self, state: WidgetState) -> str:

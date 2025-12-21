@@ -25,14 +25,10 @@ class CameraImage(Component):
     color: Color = COLOR_WHITE
     fit: str = "contain"
 
-    def measure(
-        self, ctx: RenderContext, max_width: int, max_height: int
-    ) -> tuple[int, int]:
+    def measure(self, ctx: RenderContext, max_width: int, max_height: int) -> tuple[int, int]:
         return (max_width, max_height)
 
-    def render(
-        self, ctx: RenderContext, x: int, y: int, width: int, height: int
-    ) -> None:
+    def render(self, ctx: RenderContext, x: int, y: int, width: int, height: int) -> None:
         """Render camera image."""
         # Calculate image rect
         if self.label:

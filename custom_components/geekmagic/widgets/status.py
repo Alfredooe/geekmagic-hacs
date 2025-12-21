@@ -35,14 +35,10 @@ class StatusIndicator(Component):
     icon: str | None = None
     show_status_text: bool = True
 
-    def measure(
-        self, ctx: RenderContext, max_width: int, max_height: int
-    ) -> tuple[int, int]:
+    def measure(self, ctx: RenderContext, max_width: int, max_height: int) -> tuple[int, int]:
         return (max_width, max_height)
 
-    def render(
-        self, ctx: RenderContext, x: int, y: int, width: int, height: int
-    ) -> None:
+    def render(self, ctx: RenderContext, x: int, y: int, width: int, height: int) -> None:
         """Render status indicator."""
         center_y = y + height // 2
         font_name = ctx.get_font("small")
@@ -61,14 +57,21 @@ class StatusIndicator(Component):
         # Draw dot
         dot_x = x + padding + dot_radius
         ctx.draw_ellipse(
-            rect=(dot_x - dot_radius, center_y - dot_radius, dot_x + dot_radius, center_y + dot_radius),
+            rect=(
+                dot_x - dot_radius,
+                center_y - dot_radius,
+                dot_x + dot_radius,
+                center_y + dot_radius,
+            ),
             fill=color,
         )
 
         # Draw icon
         text_x = dot_x + dot_radius + int(width * 0.06)
         if self.icon:
-            ctx.draw_icon(self.icon, (text_x, center_y - icon_size // 2), size=icon_size, color=COLOR_GRAY)
+            ctx.draw_icon(
+                self.icon, (text_x, center_y - icon_size // 2), size=icon_size, color=COLOR_GRAY
+            )
             text_x += icon_size + 4
 
         # Draw name
@@ -76,7 +79,13 @@ class StatusIndicator(Component):
 
         # Draw status text
         if self.show_status_text:
-            ctx.draw_text(status_text, (x + width - padding, center_y), font=font_status, color=color, anchor="rm")
+            ctx.draw_text(
+                status_text,
+                (x + width - padding, center_y),
+                font=font_status,
+                color=color,
+                anchor="rm",
+            )
 
 
 class StatusWidget(Widget):
@@ -118,19 +127,17 @@ class StatusWidget(Widget):
 class StatusListDisplay(Component):
     """Status list display component."""
 
-    items: list[tuple[str, bool, Color, Color]] = field(default_factory=list)  # (label, is_on, on_color, off_color)
+    items: list[tuple[str, bool, Color, Color]] = field(
+        default_factory=list
+    )  # (label, is_on, on_color, off_color)
     title: str | None = None
     on_text: str | None = None
     off_text: str | None = None
 
-    def measure(
-        self, ctx: RenderContext, max_width: int, max_height: int
-    ) -> tuple[int, int]:
+    def measure(self, ctx: RenderContext, max_width: int, max_height: int) -> tuple[int, int]:
         return (max_width, max_height)
 
-    def render(
-        self, ctx: RenderContext, x: int, y: int, width: int, height: int
-    ) -> None:
+    def render(self, ctx: RenderContext, x: int, y: int, width: int, height: int) -> None:
         """Render status list."""
         font_title = ctx.get_font("small")
         font_label = ctx.get_font("tiny")
@@ -138,7 +145,13 @@ class StatusListDisplay(Component):
         current_y = y + padding
 
         if self.title:
-            ctx.draw_text(self.title.upper(), (x + padding, current_y), font=font_title, color=COLOR_GRAY, anchor="lm")
+            ctx.draw_text(
+                self.title.upper(),
+                (x + padding, current_y),
+                font=font_title,
+                color=COLOR_GRAY,
+                anchor="lm",
+            )
             current_y += int(height * 0.15)
 
         available_height = y + height - current_y - padding
@@ -149,20 +162,37 @@ class StatusListDisplay(Component):
 
         for label, is_on, on_color, off_color in self.items:
             color = on_color if is_on else off_color
-            label = truncate_text(label, max_len, style="middle")
+            display_label = truncate_text(label, max_len, style="middle")
 
             dot_y = current_y + row_height // 2
             ctx.draw_ellipse(
-                rect=(x + padding, dot_y - dot_radius, x + padding + dot_radius * 2, dot_y + dot_radius),
+                rect=(
+                    x + padding,
+                    dot_y - dot_radius,
+                    x + padding + dot_radius * 2,
+                    dot_y + dot_radius,
+                ),
                 fill=color,
             )
 
-            ctx.draw_text(label, (x + padding + dot_radius * 2 + 6, dot_y), font=font_label, color=COLOR_WHITE, anchor="lm")
+            ctx.draw_text(
+                display_label,
+                (x + padding + dot_radius * 2 + 6, dot_y),
+                font=font_label,
+                color=COLOR_WHITE,
+                anchor="lm",
+            )
 
             if self.on_text or self.off_text:
                 status_text = self.on_text if is_on else self.off_text
                 if status_text:
-                    ctx.draw_text(status_text, (x + width - padding, dot_y), font=font_label, color=color, anchor="rm")
+                    ctx.draw_text(
+                        status_text,
+                        (x + width - padding, dot_y),
+                        font=font_label,
+                        color=color,
+                        anchor="rm",
+                    )
 
             current_y += row_height
 

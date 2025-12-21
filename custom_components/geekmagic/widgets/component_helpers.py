@@ -19,6 +19,7 @@ from .components import (
     Component,
     Empty,
     Icon,
+    IconValueDisplay,
     Ring,
     Row,
     Spacer,
@@ -162,10 +163,7 @@ def IconValue(
     label_color: Color = COLOR_GRAY,
     icon_size: int | None = None,
 ) -> Component:
-    """Icon with value and label - adapts layout based on available space.
-
-    For wide containers: horizontal layout [Icon] [Value + Label]
-    For tall containers: vertical layout stacking Icon, Value, Label
+    """Icon with value and label - uses IconValueDisplay for proper sizing.
 
     Args:
         icon: Icon name
@@ -174,35 +172,19 @@ def IconValue(
         color: Icon color
         value_color: Value text color
         label_color: Label text color
-        icon_size: Optional fixed icon size (default: auto-size with max 24px)
+        icon_size: Optional fixed icon size
 
     Returns:
-        Component tree using Adaptive for responsive layout
+        IconValueDisplay component
     """
-    # Use Icon's auto-sizing with max constraint if no explicit size given
-    # This allows container-aware sizing while preventing oversized icons
-    if icon_size is not None:
-        icon_component = Icon(icon, size=icon_size, color=color)
-    else:
-        # Auto-size with max 24px - Icon component has min_size=12, max_size=32 default
-        icon_component = Icon(icon, color=color, max_size=24)
-
-    value_component = Text(value, font="medium", bold=True, color=value_color)
-    label_component = Text(label.upper(), font="small", color=label_color)
-
-    # Use Adaptive to auto-switch between layouts
-    return Adaptive(
-        children=[
-            icon_component,
-            Column(
-                align="center",
-                justify="center",
-                gap=4,
-                children=[value_component, label_component],
-            ),
-        ],
-        gap=8,
-        padding=6,
+    return IconValueDisplay(
+        icon=icon,
+        value=value,
+        label=label,
+        icon_color=color,
+        value_color=value_color,
+        label_color=label_color,
+        icon_size=icon_size,
     )
 
 

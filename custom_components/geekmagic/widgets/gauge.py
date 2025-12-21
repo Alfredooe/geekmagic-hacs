@@ -19,10 +19,7 @@ def _extract_numeric(entity: EntityState | None, attribute: str | None = None) -
     if entity is None:
         return 0.0
 
-    if attribute:
-        value = entity.get(attribute)
-    else:
-        value = entity.state
+    value = entity.get(attribute) if attribute else entity.state
 
     try:
         return float(value)

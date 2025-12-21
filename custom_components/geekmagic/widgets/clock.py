@@ -2,66 +2,137 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
 from ..const import COLOR_GRAY, COLOR_WHITE
 from .base import Widget, WidgetConfig
-from .components import Color, Column, Component, FillText, Row, Text
+from .components import Color, Component
 
 if TYPE_CHECKING:
     from ..render_context import RenderContext
     from .state import WidgetState
 
 
-def ClockDisplay(
-    time_str: str,
-    date_str: str | None = None,
-    ampm: str | None = None,
-    label: str | None = None,
-    time_color: Color = COLOR_WHITE,
-    date_color: Color = COLOR_GRAY,
-    label_color: Color = COLOR_GRAY,
-) -> Component:
-    """Create clock display using primitive components.
+@dataclass
+class ClockDisplay(Component):
+    """Clock display component with time, date, and optional label.
 
-    Time uses FillText to fill available space, date scales proportionally.
+    Time fills the available space, date scales proportionally.
+    All sizing is computed together to ensure proper layout.
     """
-    children: list[Component] = []
 
-    # Add label at top if provided
-    if label:
-        children.append(Text(label.upper(), font="tertiary", color=label_color))
+    time_str: str
+    date_str: str | None = None
+    ampm: str | None = None
+    label: str | None = None
+    time_color: Color = COLOR_WHITE
+    date_color: Color = COLOR_GRAY
+    label_color: Color = COLOR_GRAY
 
-    # Time display - fills available space
-    if ampm:
-        # 12-hour format: time + AM/PM in a row
-        children.append(
-            Row(
-                children=[
-                    FillText(time_str, hierarchy="primary", color=time_color),
-                    Text(ampm, font="tertiary", color=COLOR_GRAY),
-                ],
-                gap=4,
-                align="end",
-                justify="center",
+    def measure(self, ctx: RenderContext, max_width: int, max_height: int) -> tuple[int, int]:
+        return (max_width, max_height)
+
+    def render(self, ctx: RenderContext, x: int, y: int, width: int, height: int) -> None:
+        """Render clock with time, date, and optional AM/PM indicator."""
+        padding = int(width * 0.04)
+        inner_width = width - padding * 2
+        inner_height = height - padding * 2
+
+        # Calculate vertical space distribution
+        label_height = 0
+        date_height = 0
+        gap = 4
+
+        if self.label:
+            label_height = int(inner_height * 0.12)
+
+        if self.date_str:
+            date_height = int(inner_height * 0.18)
+
+        # Time gets remaining space
+        time_height = inner_height - label_height - date_height
+        if self.label:
+            time_height -= gap
+        if self.date_str:
+            time_height -= gap
+
+        # Starting Y position (centered in container)
+        total_content = label_height + time_height + date_height
+        if self.label:
+            total_content += gap
+        if self.date_str:
+            total_content += gap
+        start_y = y + padding + (inner_height - total_content) // 2
+
+        current_y = start_y
+        center_x = x + width // 2
+
+        # Draw label at top
+        if self.label:
+            font_label = ctx.get_font("small")
+            ctx.draw_text(
+                self.label.upper(),
+                (center_x, current_y + label_height // 2),
+                font=font_label,
+                color=self.label_color,
+                anchor="mm",
             )
+            current_y += label_height + gap
+
+        # Draw time (fills available space)
+        time_font = ctx.fit_text(
+            self.time_str,
+            max_width=int(inner_width * 0.95),
+            max_height=int(time_height * 0.95),
+            bold=False,
         )
-    else:
-        # 24-hour format: just time
-        children.append(FillText(time_str, hierarchy="primary", color=time_color))
+        time_y = current_y + time_height // 2
 
-    # Add date below time
-    if date_str:
-        children.append(FillText(date_str, hierarchy="secondary", color=date_color))
+        if self.ampm:
+            # 12-hour format: draw time + AM/PM
+            time_w, _ = ctx.get_text_size(self.time_str, time_font)
+            ampm_font = ctx.get_font("small")
+            ampm_w, _ = ctx.get_text_size(self.ampm, ampm_font)
+            total_w = time_w + 4 + ampm_w
+            time_x = center_x - total_w // 2 + time_w // 2
+            ctx.draw_text(
+                self.time_str, (time_x, time_y), font=time_font, color=self.time_color, anchor="mm"
+            )
+            ctx.draw_text(
+                self.ampm,
+                (time_x + time_w // 2 + 4 + ampm_w // 2, time_y),
+                font=ampm_font,
+                color=COLOR_GRAY,
+                anchor="mm",
+            )
+        else:
+            ctx.draw_text(
+                self.time_str,
+                (center_x, time_y),
+                font=time_font,
+                color=self.time_color,
+                anchor="mm",
+            )
 
-    return Column(
-        children=children,
-        gap=4,
-        align="center",
-        justify="center",
-        padding=4,
-    )
+        current_y += time_height + gap
+
+        # Draw date below time
+        if self.date_str:
+            date_font = ctx.fit_text(
+                self.date_str,
+                max_width=int(inner_width * 0.90),
+                max_height=int(date_height * 0.90),
+                bold=False,
+            )
+            ctx.draw_text(
+                self.date_str,
+                (center_x, current_y + date_height // 2),
+                font=date_font,
+                color=self.date_color,
+                anchor="mm",
+            )
 
 
 class ClockWidget(Widget):

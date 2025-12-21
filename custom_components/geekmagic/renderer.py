@@ -598,12 +598,13 @@ class Renderer:
                 # Cool: (70, 130, 180) - Steel blue
                 # Warm: (255, 140, 0) - Dark orange
                 fill_color = (
-                    int(70 + (255 - 70) * avg_normalized) // 4,
-                    int(130 + (140 - 130) * avg_normalized) // 4,
-                    int(180 + (0 - 180) * avg_normalized) // 4,
+                    int(70 + (255 - 70) * avg_normalized) // 3,
+                    int(130 + (140 - 130) * avg_normalized) // 3,
+                    int(180 + (0 - 180) * avg_normalized) // 3,
                 )
             else:
-                fill_color = (color[0] // 4, color[1] // 4, color[2] // 4)
+                # Fill with ~35% opacity of line color for visible but subtle effect
+                fill_color = (color[0] // 3, color[1] // 3, color[2] // 3)
             draw.polygon(fill_points, fill=fill_color)
 
         # Draw line
