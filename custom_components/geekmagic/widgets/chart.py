@@ -50,12 +50,28 @@ class ChartDisplay(Component):
 
         # Draw header with label and value
         header_y = y + int(height * 0.08)
+        available_width = width - padding * 2
+        gap = 8  # Minimum gap between label and value
+
+        # Measure value first (takes priority)
+        value_str = ""
+        value_width = 0
+        if self.current_value is not None:
+            value_str = f"{self.current_value:.1f}{self.unit}"
+            value_width, _ = ctx.get_text_size(value_str, font_value)
+
+        # Calculate max label width
+        max_label_width = available_width - value_width - gap if value_str else available_width
 
         if self.label:
-            max_label_len = max(3, width // 12)
             display_name = self.label.upper()
-            if len(display_name) > max_label_len:
-                display_name = display_name[: max_label_len - 2] + ".."
+            label_width, _ = ctx.get_text_size(display_name, font_label)
+
+            # Truncate label if needed
+            while label_width > max_label_width and len(display_name) > 3:
+                display_name = display_name[:-3] + ".."
+                label_width, _ = ctx.get_text_size(display_name, font_label)
+
             ctx.draw_text(
                 display_name,
                 (x + padding, header_y),
@@ -64,8 +80,7 @@ class ChartDisplay(Component):
                 anchor="lm",
             )
 
-        if self.current_value is not None:
-            value_str = f"{self.current_value:.1f}{self.unit}"
+        if value_str:
             ctx.draw_text(
                 value_str,
                 (x + width - padding, header_y),
