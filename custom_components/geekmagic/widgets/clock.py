@@ -7,7 +7,13 @@ from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
 from .base import Widget, WidgetConfig
-from .components import THEME_TEXT_PRIMARY, THEME_TEXT_SECONDARY, Color, Component
+from .components import (
+    THEME_TEXT_PRIMARY,
+    THEME_TEXT_SECONDARY,
+    Color,
+    Component,
+    _resolve_color,
+)
 
 if TYPE_CHECKING:
     from ..render_context import RenderContext
@@ -35,6 +41,11 @@ class ClockDisplay(Component):
 
     def render(self, ctx: RenderContext, x: int, y: int, width: int, height: int) -> None:
         """Render clock with time, date, and optional AM/PM indicator."""
+        # Resolve theme-aware colors
+        time_color = _resolve_color(self.time_color, ctx)
+        date_color = _resolve_color(self.date_color, ctx)
+        label_color = _resolve_color(self.label_color, ctx)
+
         padding = int(width * 0.04)
         inner_width = width - padding * 2
         inner_height = height - padding * 2
@@ -75,7 +86,7 @@ class ClockDisplay(Component):
                 self.label.upper(),
                 (center_x, current_y + label_height // 2),
                 font=font_label,
-                color=self.label_color,
+                color=label_color,
                 anchor="mm",
             )
             current_y += label_height + gap
@@ -97,13 +108,14 @@ class ClockDisplay(Component):
             total_w = time_w + 4 + ampm_w
             time_x = center_x - total_w // 2 + time_w // 2
             ctx.draw_text(
-                self.time_str, (time_x, time_y), font=time_font, color=self.time_color, anchor="mm"
+                self.time_str, (time_x, time_y), font=time_font, color=time_color, anchor="mm"
             )
+            ampm_color = _resolve_color(THEME_TEXT_SECONDARY, ctx)
             ctx.draw_text(
                 self.ampm,
                 (time_x + time_w // 2 + 4 + ampm_w // 2, time_y),
                 font=ampm_font,
-                color=THEME_TEXT_SECONDARY,
+                color=ampm_color,
                 anchor="mm",
             )
         else:
@@ -111,7 +123,7 @@ class ClockDisplay(Component):
                 self.time_str,
                 (center_x, time_y),
                 font=time_font,
-                color=self.time_color,
+                color=time_color,
                 anchor="mm",
             )
 
@@ -129,7 +141,7 @@ class ClockDisplay(Component):
                 self.date_str,
                 (center_x, current_y + date_height // 2),
                 font=date_font,
-                color=self.date_color,
+                color=date_color,
                 anchor="mm",
             )
 
