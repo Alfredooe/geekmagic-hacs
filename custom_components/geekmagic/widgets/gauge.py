@@ -8,6 +8,7 @@ from ..const import COLOR_CYAN, COLOR_DARK_GRAY
 from .base import Widget, WidgetConfig
 from .component_helpers import ArcGauge, BarGauge, RingGauge
 from .components import Component
+from .helpers import calculate_percent, format_value_with_unit
 
 if TYPE_CHECKING:
     from ..render_context import RenderContext
@@ -18,31 +19,15 @@ def _extract_numeric(entity: EntityState | None, attribute: str | None = None) -
     """Extract numeric value from entity state."""
     if entity is None:
         return 0.0
-
     value = entity.get(attribute) if attribute else entity.state
-
     try:
         return float(value)
     except (ValueError, TypeError):
         return 0.0
 
 
-def _calculate_percent(value: float, min_val: float, max_val: float) -> float:
-    """Calculate percentage in range."""
-    if max_val <= min_val:
-        return 0.0
-    return max(0, min(100, (value - min_val) / (max_val - min_val) * 100))
-
-
-def _format_value_with_unit(value: str, unit: str) -> str:
-    """Format value with optional unit."""
-    if unit:
-        return f"{value}{unit}"
-    return value
-
-
-def _resolve_label(config, entity: EntityState | None) -> str:
-    """Get label from config or entity."""
+def _resolve_label(config: WidgetConfig, entity: EntityState | None) -> str:
+    """Get label from config or entity friendly_name."""
     if config.label:
         return config.label
     if entity:
@@ -104,7 +89,7 @@ class GaugeWidget(Widget):
             unit = entity.unit or ""
 
         # Calculate percentage
-        percent = _calculate_percent(value, self.min_value, self.max_value)
+        percent = calculate_percent(value, self.min_value, self.max_value)
 
         # Get label
         name = _resolve_label(self.config, entity)
@@ -114,7 +99,7 @@ class GaugeWidget(Widget):
         color = threshold_color or self.config.color or COLOR_CYAN
 
         # Format value with unit
-        value_text = _format_value_with_unit(display_value, unit) if self.show_value else ""
+        value_text = format_value_with_unit(display_value, unit) if self.show_value else ""
 
         if self.style == "ring":
             return RingGauge(

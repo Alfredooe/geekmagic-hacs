@@ -11,7 +11,8 @@ if TYPE_CHECKING:
     from .base import WidgetConfig
 
 # States considered "on" for binary sensors and similar entities
-ON_STATES = frozenset({"on", "true", "home", "locked", "1"})
+# Includes common affirmative states across different entity types
+ON_STATES = frozenset({"on", "true", "home", "locked", "open", "unlocked", "1"})
 
 
 def truncate_text(
@@ -367,6 +368,74 @@ def _get_domain_icon(domain: str) -> str | None:
         "valve": "mdi:valve",
     }
     return domain_icons.get(domain)
+
+
+def calculate_padding(width: int, density: str = "standard") -> int:
+    """Calculate padding based on width and density preference.
+
+    Provides consistent padding calculations across all widgets.
+
+    Args:
+        width: Container width in pixels
+        density: Density level:
+            - "compact": 4% - for dense grids (3x3)
+            - "standard": 5% - for normal layouts (2x2)
+            - "spacious": 6% - for hero/fullscreen layouts
+
+    Returns:
+        Padding in pixels (minimum 4px)
+    """
+    ratios = {"compact": 0.04, "standard": 0.05, "spacious": 0.06}
+    return max(4, int(width * ratios.get(density, 0.05)))
+
+
+def calculate_icon_size(height: int, prominence: str = "standard") -> int:
+    """Calculate icon size based on container height and prominence.
+
+    Provides consistent icon sizing across all widgets.
+
+    Args:
+        height: Container height in pixels
+        prominence: Icon prominence level:
+            - "small": 18% - secondary icons, inline with text
+            - "standard": 25% - normal prominence
+            - "large": 35% - primary/hero icons
+
+    Returns:
+        Icon size in pixels (clamped to 12-48px range)
+    """
+    ratios = {"small": 0.18, "standard": 0.25, "large": 0.35}
+    ratio = ratios.get(prominence, 0.25)
+    return max(12, min(48, int(height * ratio)))
+
+
+def resolve_widget_color(
+    config_color: tuple[int, int, int] | None,
+    default_color: tuple[int, int, int],
+    theme: object | None = None,
+) -> tuple[int, int, int]:
+    """Resolve widget color from config, theme, or default.
+
+    Priority:
+    1. Explicit config color (user override)
+    2. Theme primary color (if available)
+    3. Default color (fallback)
+
+    Args:
+        config_color: Color from widget config (may be None)
+        default_color: Default fallback color
+        theme: Theme object with primary color (optional)
+
+    Returns:
+        Resolved RGB color tuple
+    """
+    if config_color:
+        return config_color
+    if theme and hasattr(theme, "primary"):
+        primary = theme.primary
+        if isinstance(primary, tuple) and len(primary) == 3:
+            return primary  # type: ignore[return-value]
+    return default_color
 
 
 def estimate_max_chars(
