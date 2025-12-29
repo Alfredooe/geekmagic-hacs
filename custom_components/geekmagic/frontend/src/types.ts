@@ -102,6 +102,7 @@ export interface WidgetOption {
     | "icon"
     | "color"
     | "entity"
+    | "timezone"
     | "thresholds"
     | "progress_items"
     | "status_entities";

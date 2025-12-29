@@ -21,6 +21,35 @@ import type {
   ColorThreshold,
 } from "./types";
 
+// Type declaration for Intl.supportedValuesOf (ES2022+)
+declare global {
+  namespace Intl {
+    function supportedValuesOf(key: string): string[];
+  }
+}
+
+// Get all IANA timezones from the browser
+const TIMEZONES: string[] = (() => {
+  try {
+    return Intl.supportedValuesOf("timeZone");
+  } catch {
+    // Fallback for older browsers
+    return [
+      "UTC",
+      "America/New_York",
+      "America/Chicago",
+      "America/Denver",
+      "America/Los_Angeles",
+      "Europe/London",
+      "Europe/Paris",
+      "Europe/Berlin",
+      "Asia/Tokyo",
+      "Asia/Shanghai",
+      "Australia/Sydney",
+    ];
+  }
+})();
+
 // Debounce helper
 function debounce<T extends (...args: unknown[]) => void>(
   fn: T,
@@ -1242,6 +1271,23 @@ export class GeekMagicPanel extends LitElement {
 
       case "status_entities":
         return this._renderStatusEntitiesEditor(slot, opt.key, value as StatusEntity[] | undefined);
+
+      case "timezone":
+        return html`
+          <div class="option-field">
+            <ha-combo-box
+              .hass=${this.hass}
+              .label=${opt.label}
+              .value=${value || ""}
+              .items=${TIMEZONES.map((tz) => ({ value: tz, label: tz }))}
+              item-value-path="value"
+              item-label-path="label"
+              allow-custom-value
+              @value-changed=${(e: CustomEvent) =>
+                this._updateWidgetOption(slot, opt.key, e.detail.value)}
+            ></ha-combo-box>
+          </div>
+        `;
 
       default:
         return nothing;

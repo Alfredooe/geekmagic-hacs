@@ -55,9 +55,8 @@ WIDGET_TYPE_SCHEMAS: dict[str, dict[str, Any]] = {
             },
             {
                 "key": "timezone",
-                "type": "text",
+                "type": "timezone",
                 "label": "Timezone",
-                "placeholder": "e.g., America/New_York",
             },
         ],
     },
