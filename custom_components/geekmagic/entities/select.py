@@ -20,10 +20,14 @@ _LOGGER = logging.getLogger(__name__)
 
 # Built-in device modes with their theme numbers
 # These are handled by the device firmware, not rendered by the integration
+# Theme 3 (Photo Album) is intentionally omitted - used for custom rendered views
 BUILTIN_MODES = {
-    "Clock": 0,
-    "Weather": 1,
-    "System Info": 2,
+    "Weather Clock Today": 1,
+    "Weather Forecast": 2,
+    "Time Style 1": 4,
+    "Time Style 2": 5,
+    "Time Style 3": 6,
+    "Simple Weather Clock": 7,
 }
 
 # Prefix used to identify custom views in the combined select
