@@ -13,12 +13,16 @@ from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .const import (
+    CONF_DISPLAY_ROTATION,
+    CONF_JPEG_QUALITY,
     CONF_LAYOUT,
     CONF_REFRESH_INTERVAL,
     CONF_SCREEN_CYCLE_INTERVAL,
     CONF_SCREEN_THEME,
     CONF_SCREENS,
     CONF_WIDGETS,
+    DEFAULT_DISPLAY_ROTATION,
+    DEFAULT_JPEG_QUALITY,
     DEFAULT_REFRESH_INTERVAL,
     DEFAULT_SCREEN_CYCLE_INTERVAL,
     DOMAIN,
@@ -86,6 +90,8 @@ class GeekMagicConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return {
             CONF_REFRESH_INTERVAL: DEFAULT_REFRESH_INTERVAL,
             CONF_SCREEN_CYCLE_INTERVAL: DEFAULT_SCREEN_CYCLE_INTERVAL,
+            CONF_JPEG_QUALITY: DEFAULT_JPEG_QUALITY,
+            CONF_DISPLAY_ROTATION: DEFAULT_DISPLAY_ROTATION,
             CONF_SCREENS: [
                 {
                     "name": "Screen 1",
