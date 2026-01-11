@@ -79,10 +79,10 @@ class TestNotification:
 
         assert isinstance(layout, HeroSimpleLayout)
         # Slot 0 should be CameraWidget because image starts with camera.
-        assert layout.get_widget(0).config.widget_type == "camera"
+        assert layout.get_slot(0).widget.config.widget_type == "camera"
 
         # Slot 1 should be TextWidget with message only
-        text_widget = layout.get_widget(1)
+        text_widget = layout.get_slot(1).widget
         assert text_widget.config.widget_type == "text"
         assert text_widget.config.options["text"] == "Test Message"
         assert text_widget.config.options["align"] == "center"
@@ -101,7 +101,7 @@ class TestNotification:
         assert isinstance(layout, FullscreenLayout)
 
         # Slot 0 should be full screen camera
-        camera_widget = layout.get_widget(0)
+        camera_widget = layout.get_slot(0).widget
         assert camera_widget.config.widget_type == "camera"
         assert camera_widget.config.options["fit"] == "contain"
 
@@ -118,7 +118,7 @@ class TestNotification:
         layout = coordinator._create_notification_layout(data)
         assert isinstance(layout, FullscreenLayout)
 
-        icon_widget = layout.get_widget(0)
+        icon_widget = layout.get_slot(0).widget
         assert icon_widget.config.widget_type == "icon"
         assert icon_widget.config.options["icon"] == "mdi:alert"
         assert icon_widget.config.options["size"] == "huge"
