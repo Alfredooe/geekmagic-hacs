@@ -27,10 +27,11 @@ jobs:
       - name: Install pre-commit
         run: uv tool install pre-commit
 
-      - name: Run pre-commit (ruff lint + format)
+      - name: Run pre-commit (ruff + translations)
         run: |
           pre-commit run --all-files ruff
           pre-commit run --all-files ruff-format
+          pre-commit run --all-files check-translations
 
   test:
     name: Test
