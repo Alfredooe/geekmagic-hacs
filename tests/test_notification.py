@@ -112,10 +112,7 @@ class TestNotification:
         """Test notification layout with an image entity."""
         coordinator = GeekMagicCoordinator(hass, coordinator_device, options)
 
-        data = {
-            "message": "Image Entity",
-            "image": "image.reolink_snap"
-        }
+        data = {"message": "Image Entity", "image": "image.reolink_snap"}
 
         layout = coordinator._create_notification_layout(data)
         assert isinstance(layout, HeroSimpleLayout)

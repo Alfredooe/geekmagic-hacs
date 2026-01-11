@@ -1150,10 +1150,7 @@ class GeekMagicCoordinator(DataUpdateCoordinator):
             return
 
         # Use internal URL from HA config, but fall back to external_url if needed
-        base_url = (
-            self.hass.config.internal_url
-            or getattr(self.hass.config, "external_url", None)
-        )
+        base_url = self.hass.config.internal_url or getattr(self.hass.config, "external_url", None)
         if not base_url:
             _LOGGER.debug("No base URL available for entity picture fetch")
             return
@@ -1230,9 +1227,8 @@ class GeekMagicCoordinator(DataUpdateCoordinator):
                 continue
 
             # Use internal URL from HA config, but fall back to external_url if needed
-            base_url = (
-                self.hass.config.internal_url
-                or getattr(self.hass.config, "external_url", None)
+            base_url = self.hass.config.internal_url or getattr(
+                self.hass.config, "external_url", None
             )
             if not base_url:
                 continue
