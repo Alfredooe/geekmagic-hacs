@@ -74,10 +74,10 @@ from .widgets.chart import ChartWidget
 from .widgets.clock import ClockWidget
 from .widgets.entity import EntityWidget
 from .widgets.gauge import GaugeWidget
+from .widgets.icon import IconWidget
 from .widgets.media import MediaWidget
 from .widgets.progress import MultiProgressWidget, ProgressWidget
 from .widgets.state import EntityState, WidgetState
-from .widgets.icon import IconWidget
 from .widgets.status import StatusListWidget, StatusWidget
 from .widgets.text import TextWidget
 from .widgets.theme import get_theme
@@ -667,7 +667,7 @@ class GeekMagicCoordinator(DataUpdateCoordinator):
         # Render current screen's layout
         if self._layouts and 0 <= self._current_screen < len(self._layouts):
             layout = self._layouts[self._current_screen]
-            
+
             # Check for active notification
             if time.time() < self._notification_expiry and self._notification_data:
                 _LOGGER.debug("Rendering active notification")
@@ -706,10 +706,10 @@ class GeekMagicCoordinator(DataUpdateCoordinator):
         duration = data.get("duration", 10)
         self._notification_data = data
         self._notification_expiry = time.time() + duration
-        
+
         # Schedule cleanup
         self.hass.loop.call_later(duration, self._clear_notification)
-        
+
         # Force immediate refresh
         await self.async_request_refresh()
 
@@ -730,27 +730,30 @@ class GeekMagicCoordinator(DataUpdateCoordinator):
             Layout: HeroSimpleLayout (with message) or FullscreenLayout (image only)
         """
         message = data.get("message")
-        
+
         # Scenario 1: No message -> Fullscreen Layout (Image/Icon only)
         if not message:
             layout = FullscreenLayout()
             # Apply theme if specified
             theme_name = data.get("theme", THEME_CLASSIC)
             layout.theme = get_theme(theme_name)
-            
+
             hero_widget = None
             image_url = data.get("image")
-            
+
             if image_url and image_url.startswith("camera."):
-                 hero_widget = CameraWidget(
+                hero_widget = CameraWidget(
                     WidgetConfig(
                         widget_type="camera",
                         slot=0,
                         entity_id=image_url,
-                        options={"fit": "contain"} # contain ensures full image visible, cover fills screen
+                        options={
+                            # contain ensures full image visible, cover fills screen
+                            "fit": "contain",
+                        },
                     )
-                 )
-            
+                )
+
             if not hero_widget:
                 # Default to Icon
                 icon = data.get("icon", "mdi:bell-ring")
@@ -761,9 +764,9 @@ class GeekMagicCoordinator(DataUpdateCoordinator):
                         color=COLOR_CYAN,
                         options={
                             "icon": icon,
-                            "size": "huge", # This option is now supported by IconWidget
-                            "show_panel": False # Clean fullscreen look
-                        }
+                            "size": "huge",  # This option is now supported by IconWidget
+                            "show_panel": False,  # Clean fullscreen look
+                        },
                     )
                 )
             layout.set_widget(0, hero_widget)
@@ -771,25 +774,21 @@ class GeekMagicCoordinator(DataUpdateCoordinator):
 
         # Scenario 2: Message exists -> Hero Simple Layout
         layout = HeroSimpleLayout()
-        
+
         # Apply theme if specified
         theme_name = data.get("theme", THEME_CLASSIC)
         layout.theme = get_theme(theme_name)
-        
+
         # Slot 0 (Hero): Icon or Image
         hero_widget = None
         image_url = data.get("image")
-        if image_url:
-             if image_url.startswith("camera."):
-                 hero_widget = CameraWidget(
-                    WidgetConfig(
-                        widget_type="camera",
-                        slot=0,
-                        entity_id=image_url,
-                        options={"fit": "contain"}
-                    )
-                 )
-        
+        if image_url and image_url.startswith("camera."):
+            hero_widget = CameraWidget(
+                WidgetConfig(
+                    widget_type="camera", slot=0, entity_id=image_url, options={"fit": "contain"}
+                )
+            )
+
         if not hero_widget:
             # Default to Icon
             icon = data.get("icon", "mdi:bell-ring")
@@ -800,8 +799,8 @@ class GeekMagicCoordinator(DataUpdateCoordinator):
                     color=COLOR_CYAN,
                     options={
                         "icon": icon,
-                        "size": "huge" # Force huge icon
-                    }
+                        "size": "huge",  # Force huge icon
+                    },
                 )
             )
         layout.set_widget(0, hero_widget)
@@ -816,7 +815,7 @@ class GeekMagicCoordinator(DataUpdateCoordinator):
                     "text": message,
                     "size": "medium",
                     "align": "center",
-                }
+                },
             )
         )
         layout.set_widget(1, text_widget)

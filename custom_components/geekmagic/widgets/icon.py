@@ -27,13 +27,13 @@ class IconWidget(Widget):
 
     def render(self, ctx: RenderContext, state: WidgetState) -> Component:
         """Render the icon widget."""
-        
+
         # Handle "huge" mode
         max_size = 32
         if self.size_mode == "huge":
             # Arbitrary large number to allow filling the container,
             # Icon component will clamp to available space.
-            max_size = 240 
+            max_size = 240
 
         # Resolve color
         color = self.color or self.config.color or COLOR_CYAN

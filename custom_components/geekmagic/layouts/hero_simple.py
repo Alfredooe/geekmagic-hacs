@@ -41,7 +41,7 @@ class HeroSimpleLayout(Layout):
         self.slots = []
 
         # Available dimensions
-        available_width = self.width - (2 * self.padding)
+
         available_height = self.height - (2 * self.padding) - self.gap
 
         # Hero section
@@ -63,7 +63,7 @@ class HeroSimpleLayout(Layout):
         # Footer slot (index 1)
         # Starts after hero + gap
         footer_y = self.padding + hero_height + self.gap
-        
+
         self.slots.append(
             Slot(
                 index=1,

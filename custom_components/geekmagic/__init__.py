@@ -8,8 +8,8 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .const import DOMAIN
 from .coordinator import GeekMagicCoordinator
@@ -71,12 +71,12 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
 
         # Get device registry to map device_ids to config entries
         dev_reg = dr.async_get(hass)
-        
+
         for device_id in device_ids:
             device = dev_reg.async_get(device_id)
             if not device:
                 continue
-            
+
             # Find config entry for this device
             for entry_id in device.config_entries:
                 if entry_id in hass.data[DOMAIN]:
