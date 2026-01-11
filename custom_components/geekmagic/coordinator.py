@@ -215,6 +215,10 @@ class GeekMagicCoordinator(DataUpdateCoordinator):
         self._last_brightness_poll: float = 0  # Timestamp of last brightness poll
         self._brightness_poll_interval: float = 600  # 10 minutes
 
+        # Notification state
+        self._notification_expiry: float = 0
+        self._notification_data: dict[str, Any] | None = None
+
         # Display mode tracking
         # "custom" = integration renders views, "builtin" = device shows built-in mode
         self._display_mode: str = "custom"
@@ -658,6 +662,12 @@ class GeekMagicCoordinator(DataUpdateCoordinator):
         # Render current screen's layout
         if self._layouts and 0 <= self._current_screen < len(self._layouts):
             layout = self._layouts[self._current_screen]
+            
+            # Check for active notification
+            if time.time() < self._notification_expiry and self._notification_data:
+                _LOGGER.debug("Rendering active notification")
+                layout = self._create_notification_layout(self._notification_data)
+
             _LOGGER.debug(
                 "Rendering layout %s with %d widgets",
                 type(layout).__name__,
@@ -681,6 +691,131 @@ class GeekMagicCoordinator(DataUpdateCoordinator):
         png_data = self.renderer.to_png(img, rotation=rotation)
 
         return jpeg_data, png_data
+
+    async def trigger_notification(self, data: dict[str, Any]) -> None:
+        """Trigger a notification on this device.
+
+        Args:
+            data: Notification data (message, title, icon, duration, etc.)
+        """
+        duration = data.get("duration", 10)
+        self._notification_data = data
+        self._notification_expiry = time.time() + duration
+        
+        # Schedule cleanup
+        self.hass.loop.call_later(duration, self._clear_notification)
+        
+        # Force immediate refresh
+        await self.async_request_refresh()
+
+    def _clear_notification(self) -> None:
+        """Clear the active notification and refresh."""
+        self._notification_expiry = 0
+        self._notification_data = None
+        # Use fire-and-forget for the refresh since this is a callback
+        self.hass.async_create_task(self.async_request_refresh())
+
+    def _create_notification_layout(self, data: dict[str, Any]) -> Layout:
+        """Create a layout for a notification.
+
+        Args:
+            data: Notification data
+
+        Returns:
+            Configured HeroLayout
+        """
+        # Use Hero layout: Icon/Image in hero slot, Title/Message in footer
+        layout = HeroLayout(footer_slots=3, hero_ratio=0.6, padding=8, gap=8)
+        
+        # Apply theme if specified
+        theme_name = data.get("theme", THEME_CLASSIC)
+        layout.theme = get_theme(theme_name)
+        
+        # Slot 0 (Hero): Icon or Image
+        hero_widget = None
+        image_url = data.get("image")
+        if image_url:
+            # If it's a full URL, we might need to fetch it? 
+            # For now, let's assume CameraWidget can handle it if we passed it cleverly,
+            # but actually CameraWidget expects an entity_id.
+            # So we'll stick to icons for this version unless we add "image from url" widget.
+            # OR we use the "camera" widget if the user passed an entity_id in the image field?
+            # Let's support entity_id if they passed one in "image"
+             if image_url.startswith("camera."):
+                 hero_widget = CameraWidget(
+                    WidgetConfig(
+                        widget_type="camera",
+                        slot=0,
+                        entity_id=image_url,
+                        options={"fit": "contain"}
+                    )
+                 )
+        
+        if not hero_widget:
+            # Default to Icon
+            icon = data.get("icon", "mdi:bell-ring")
+            hero_widget = EntityWidget(
+                WidgetConfig(
+                    widget_type="entity",
+                    slot=0,
+                    color=COLOR_CYAN,
+                    options={
+                        "icon": icon,
+                        "show_name": False,
+                        "show_state": False,
+                        "show_icon": True,
+                        "size": "huge" # Force huge icon
+                    }
+                )
+            )
+        layout.set_widget(0, hero_widget)
+
+        # Slot 1 (Footer Top): Title
+        title = data.get("title")
+        if title:
+            title_widget = TextWidget(
+                WidgetConfig(
+                    widget_type="text",
+                    slot=1,
+                    color=COLOR_WHITE,
+                    options={
+                        "text": title,
+                        "size": "medium",
+                        "align": "center",
+                        "bold": True
+                    }
+                )
+            )
+            layout.set_widget(1, title_widget)
+
+        # Slot 2 (Footer Middle): Message
+        message = data.get("message", "")
+        msg_widget = TextWidget(
+            WidgetConfig(
+                widget_type="text",
+                slot=2,
+                color=COLOR_WHITE,  
+                options={
+                    "text": message,
+                    "size": "small",
+                    "align": "center"
+                }
+            )
+        )
+        layout.set_widget(2, msg_widget)
+        
+        # Slot 3 (Footer Bottom): Time
+        time_widget = ClockWidget(
+             WidgetConfig(
+                widget_type="clock",
+                slot=3,
+                color=COLOR_GRAY,
+                options={"show_date": False, "show_seconds": True, "size": "tiny"}
+            )
+        )
+        layout.set_widget(3, time_widget)
+
+        return layout
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Fetch data and update display.

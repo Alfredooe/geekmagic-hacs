@@ -1,0 +1,62 @@
+notify:
+  name: Show Notification
+  description: Shows a temporary notification on the display.
+  fields:
+    device_id:
+      name: Device
+      description: The GeekMagic device(s) to show the notification on.
+      required: true
+      selector:
+        device:
+          integration: geekmagic
+    message:
+      name: Message
+      description: The main notification text.
+      required: true
+      selector:
+        text:
+    title:
+      name: Title
+      description: Optional title for the notification header.
+      required: false
+      selector:
+        text:
+    icon:
+      name: Icon
+      description: Icon to display (e.g. mdi:bell).
+      required: false
+      selector:
+        icon:
+    image:
+      name: Image URL
+      description: Optional image URL or path to display instead of icon.
+      required: false
+      selector:
+        text:
+    duration:
+      name: Duration
+      description: How long to show the notification in seconds (default 10).
+      required: false
+      default: 10
+      selector:
+        number:
+          min: 1
+          max: 300
+          unit_of_measurement: seconds
+    theme:
+      name: Theme
+      description: Visual theme for the notification (default Classic).
+      required: false
+      selector:
+        select:
+          options:
+            - classic
+            - minimal
+            - neon
+            - retro
+            - soft
+            - ocean
+            - sunset
+            - forest
+            - light
+            - candy

@@ -8,6 +8,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers import device_registry as dr
 
 from .const import DOMAIN
 from .coordinator import GeekMagicCoordinator
@@ -56,6 +57,30 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
 
     # Register custom panel
     await async_register_panel(hass)
+
+    # Register notify service
+    async def async_handle_notify(call):
+        """Handle the notify service call."""
+        device_ids = call.data.get("device_id")
+        if not isinstance(device_ids, list):
+            device_ids = [device_ids]
+
+        # Get device registry to map device_ids to config entries
+        dev_reg = dr.async_get(hass)
+        
+        for device_id in device_ids:
+            device = dev_reg.async_get(device_id)
+            if not device:
+                continue
+            
+            # Find config entry for this device
+            for entry_id in device.config_entries:
+                if entry_id in hass.data[DOMAIN]:
+                    coordinator = hass.data[DOMAIN][entry_id]
+                    if isinstance(coordinator, GeekMagicCoordinator):
+                        await coordinator.trigger_notification(call.data)
+
+    hass.services.async_register(DOMAIN, "notify", async_handle_notify)
 
     _LOGGER.info("GeekMagic domain setup complete")
     return True
